@@ -320,10 +320,11 @@
       const table = obj.table;
   
       // 1行目の見出しを取得
-      const headers = table.cols.map(col => col.label || '');
+      const headers = table.rows[0] ? table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v) : '') : '') : [];
   
       // 2行目以降のデータをオブジェクトの配列に変換
-      return table.rows.map(row => {
+      const dataRows = table.rows.slice(1);
+      return dataRows.map(row => {
         const item = {};
         row.c.forEach((cell, index) => {
           const header = headers[index];
