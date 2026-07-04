@@ -152,57 +152,54 @@
     }
 
     window.onload = function() {
-    initMap();
-    const gasUrl = 'https://script.google.com/macros/s/AKfycby2H_2OWkDya9cRYtCET0w-r_aK3bipk8mslw0yD8OB_XLk8AdQVPJirzH1Rmxw_Yk4/exec';
+      initMap();
+      window.google = {
+        visualization: {
+          Query: {
+            setResponse: function(obj) {
+              try {
+                if (!obj || !obj.table) throw new Error('データ空');
+                const table = obj.table;
+                const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v) : '') : '');
+                const dataRows = table.rows.slice(1);
+                const formattedData = dataRows.map(row => {
+                  const item = {};
+                  row.c.forEach((cell, index) => {
+                    const header = headers[index];
+                    if (header) {
+                      item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
+                    }
+                  });
 
-    fetch(gasUrl)
-    .then(response => {
-    if (!response.ok) throw new Error('通信エラー');
-    return response.json();
-    })
-    .then(data => {
-    if (!data || data.length < 2) throw new Error('データ空');
-    const headers = data.shift().map(h => String(h).trim());
+                  if (item['座標']) {
+                    const coords = String(item['座標']).split(/[、,，\s]+/);
+                    if (coords.length >= 2) {
+                      item['緯度'] = parseFloat(coords[0]);
+                      item['経度'] = parseFloat(coords[1]);
+                    }
+                  }
+                  item['名称'] = item['地名'] || item['道路名'] || '無名のスポット';
+                  return item;
+                }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
 
-    // 「座標」や「地名」という文字が含まれる列を自動で探す
-    const coordIdx = headers.findIndex(h => h.includes('座標'));
-    const nameIdx = headers.findIndex(h => h.includes('地名') || h.includes('名称'));
-    const roadIdx = headers.findIndex(h => h.includes('道路名'));
+                if (formattedData.length === 0) {
+                  formattedData.push({'名称': 'JSONP通信テスト', '緯度': 35.6827736, '経度': 139.7733608, '地名': '日本橋'});
+                }
+                
+                allData = formattedData;
+                renderData(allData);
+              } catch (err) {
+                document.getElementById('listContainer').innerHTML = '<div class="no-data">変換エラー: ' + err.message + '</div>';
+              }
+            }
+          }
+        }
+      };
 
-    const formattedData = data.map(row => {
-    const item = {};
-    headers.forEach((h, i) => { item[h] = row[i]; });
-
-    // 座標を全角半角カンマ・スペース問わず分解する
-    if (coordIdx !== -1 && row[coordIdx]) {
-    const coords = String(row[coordIdx]).split(/[、,，\s]+/);
-    if (coords.length >= 2) {
-    item['緯度'] = parseFloat(coords[0]);
-    item['経度'] = parseFloat(coords[1]);
-    }
-    }
-    const textName = (nameIdx !== -1 ? row[nameIdx] : '') || (roadIdx !== -1 ? row[roadIdx] : '');
-    item['名称'] = String(textName).trim() || '無名のスポット';
-    return item;
-    }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
-
-    // 💡【最重要】もし判定が厳しくて0件になっても、ダミーを入れてポップアップを強制阻止する
-    if (formattedData.length === 0) {
-    formattedData.push({
-    '名称': 'データ連携テスト（日本橋）',
-    '緯度': 35.6827736,
-    '経度': 139.7733608,
-    '地名': '日本橋'
-    });
-    }
-
-    allData = formattedData;
-    renderData(allData);
-    })
-    .catch(err => {
-    document.getElementById('listContainer').innerHTML = '<div class="no-data">エラー: ' + err.message + '</div>';
-    console.error(err);
-    });
+      const script = document.createElement('script');
+      const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';      
+      script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
+      document.body.appendChild(script);
     };
        
     let searchTimeout;
