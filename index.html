@@ -160,11 +160,8 @@
       fetch(url)
         .then(response => response.text())
         .then(text => {
-          const data = parseGoogleSheetResponse(text);
-    
-    // 💡【重要】データが届いた後に、地図にピンを打つ関数をここで呼び出します。
-    // 元のコードで「.then(data => {」の直後に書かれていた関数名（例：renderMarkers(data); など）に書き換えてください。
-          renderMarkers(data); 
+          const data = parseGoogleSheetResponse(text); 
+          renderData(allData);
         })
         .catch(error => {
           console.error('データの取得に失敗しました:', error);
