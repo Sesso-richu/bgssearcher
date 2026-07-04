@@ -151,14 +151,12 @@
       markerGroup = L.layerGroup().addTo(map);
     }
 
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-ckh1I0XrKxbdTXUt8wX7_Ii2KkyGA5zR4Sxh4lkruBhsDVxl-HuvxgNmfvhvVEq2/exec";
-
     window.onload = function() {
       initMap();
-      fetch(GAS_WEB_APP_URL)
-        .then(response => response.text())
+      fetch('./data.json')
+        .then(response => response.json())
         .then(text => {
-          allData = JSON.parse(text);
+          allData = data;
           renderData(allData);
         })
         .catch(err => {
