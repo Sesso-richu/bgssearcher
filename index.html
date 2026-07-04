@@ -153,15 +153,28 @@
 
     window.onload = function() {
       initMap();
+
       window.google = {
         visualization: {
           Query: {
             setResponse: function(obj) {
               try {
-                if (!obj || !obj.table) throw new Error('データ空');
+                if (obj.status === 'error') throw new Error(obj.errors[0].message);
+                if (!obj || !obj.table) throw new Error('データが空っぽです');
+                
                 const table = obj.table;
-                const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v) : '') : '');
-                const dataRows = table.rows.slice(1);
+                let headers = [];
+                let dataRows = [];
+                
+                // Googleの気まぐれに対応（見出しの位置を自動探知）
+                if (table.cols && table.cols[0] && table.cols[0].label) {
+                  headers = table.cols.map(c => String(c.label || '').trim());
+                  dataRows = table.rows;
+                } else if (table.rows && table.rows.length > 0) {
+                  headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
+                  dataRows = table.rows.slice(1);
+                }
+
                 const formattedData = dataRows.map(row => {
                   const item = {};
                   row.c.forEach((cell, index) => {
@@ -182,26 +195,31 @@
                   return item;
                 }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
 
+                // 通信は成功したけれどデータがうまく変換できなかった場合
                 if (formattedData.length === 0) {
-                  formattedData.push({'名称': 'JSONP通信テスト', '緯度': 35.6827736, '経度': 139.7733608, '地名': '日本橋'});
+                  formattedData.push({'名称': '通信成功！しかしデータ0件（日本橋）', '緯度': 35.6827736, '経度': 139.7733608, '地名': '日本橋'});
                 }
                 
                 allData = formattedData;
                 renderData(allData);
               } catch (err) {
-                document.getElementById('listContainer').innerHTML = '<div class="no-data">変換エラー: ' + err.message + '</div>';
+                document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">変換エラー: ' + err.message + '</div>';
               }
             }
           }
         }
       };
 
+      const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
       const script = document.createElement('script');
-      const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';      
       script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
+      script.onerror = function() {
+        document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">【通信ブロック】<br>スプレッドシートの右上「共有」から、一般的なアクセスを「リンクを知っている全員」に変更してください。<br>またはシートIDのコピペミスがないか確認してください。</div>';
+      };
+      
       document.body.appendChild(script);
     };
-       
+     
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', function() {
      clearTimeout(searchTimeout);
