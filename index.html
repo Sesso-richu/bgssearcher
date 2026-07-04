@@ -156,36 +156,47 @@
         Query: { 
           setResponse: function(obj) { 
             window.handleGoogleResponse(obj); } } } };
-
+    
     window.onload = function() {
       initMap();
       window.handleGoogleResponse = function(obj) {
         try {
           if (!obj || !obj.table) throw new Error('データ空');
           const table = obj.table;
-          const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
-
+          const COORD_COL_INDEX = 8; 
+          const NAME_COL_INDEX = 3;
           const dataRows = table.rows.slice(1);
           const formattedData = dataRows.map(row => {
+            if (!row || !row.c) return null;
             const item = {};
-            row.c.forEach((cell, index) => {
-              const header = headers[index];
-              if (header) item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
-            });
 
-            if (item['座標']) {
-              const coords = String(item['座標']).split(/[、,，\s]+/);
+            // 1. 指定された列から直接「座標」をぶっこ抜く
+            const coordCell = row.c[COORD_COL_INDEX];
+            if (coordCell && coordCell.v !== null) {
+              const coords = String(coordCell.v).split(/[、,，\s]+/);
               if (coords.length >= 2) {
                 item['緯度'] = parseFloat(coords[0]);
                 item['経度'] = parseFloat(coords[1]);
+                // 元のrenderDataが「row['座標']」を直接文字分割して使う仕様になっているため、ここでも復元
+                item['座標'] = String(coordCell.v);
               }
             }
-            item['名称'] = item['地名'] || item['道路名'] || '無名のスポット';
+
+            // 2. 指定された列から直接「名前」をぶっこ抜く
+            const nameCell = row.c[NAME_COL_INDEX];
+            item['名称'] = (nameCell && nameCell.v !== null) ? String(nameCell.v).trim() : '無名のスポット';
+            
+            // 3. 既存のrenderDataがクラッシュしないよう、空の器だけ用意
+            item['道路名'] = item['名称'];
+            item['地名'] = '';
+            item['住所'] = '';
+
             return item;
-          }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
+          }).filter(item => item !== null && !isNaN(item['緯度']) && !isNaN(item['経度']));
 
           if (formattedData.length === 0) {
-            document.getElementById('listContainer').innerHTML = '<div class="no-data">データ変換に失敗している可能性があります</div>';
+            document.getElementById('listContainer').innerHTML = 
+              '<div class="no-data">列の番号設定（COORD_COL_INDEX）が実際のシートとズレている可能性があります</div>';
             return;
           }
 
@@ -196,16 +207,12 @@
         }
       };
 
-      // データの読み込み開始
       const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
       const script = document.createElement('script');
       script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
-      script.onerror = function() {
-        document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">通信ブロックが発生しました</div>';
-      };
       document.body.appendChild(script);
     };
-     
+    
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', function() {
      clearTimeout(searchTimeout);
