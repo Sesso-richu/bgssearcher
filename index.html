@@ -153,17 +153,24 @@
 
     window.onload = function() {
       initMap();
-      fetch('./map_data.json'')
-        .then(response => response.json())
+      const spreadsheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
+      const sheetName = 'シート1';
+      const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+
+      fetch(url)
+        .then(response => response.text())
         .then(text => {
-          allData = data;
-          renderData(allData);
+          const data = parseGoogleSheetResponse(text);
+    
+    // 💡【重要】データが届いた後に、地図にピンを打つ関数をここで呼び出します。
+    // 元のコードで「.then(data => {」の直後に書かれていた関数名（例：renderMarkers(data); など）に書き換えてください。
+          renderMarkers(data); 
         })
-        .catch(err => {
-          document.getElementById('listContainer').innerHTML =
-          '<div class="no-data">データの取得に失敗しました</div>';
-          console.error(err);
+        .catch(error => {
+          console.error('データの取得に失敗しました:', error);
+          alert('スプレッドシートからデータを取得できませんでした');
         });
+  
     };
        
     let searchTimeout;
@@ -306,6 +313,28 @@
 
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
+    }
+    
+    function parseGoogleSheetResponse(text) {
+      const rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+      if (!rawData) return [];
+  
+      const obj = JSON.parse(rawData[1]);
+      const table = obj.table;
+  
+      // 1行目の見出しを取得
+      const headers = table.cols.map(col => col.label || '');
+  
+      // 2行目以降のデータをオブジェクトの配列に変換
+      return table.rows.map(row => {
+        const item = {};
+        row.c.forEach((cell, index) => {
+          const header = headers[index];
+          if (header) { item[header] = cell ? (cell.v !== null ? cell.v : '') : '';
+          }
+        });
+        return item;
+      });
     }
   </script>
 </body>
