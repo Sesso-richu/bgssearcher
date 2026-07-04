@@ -127,7 +127,6 @@
     <input type="text" id="searchInput" placeholder="地名を入力…">
   </div>
 
-
   <div class="content-wrapper">
     <div class="list-container" id="listContainer">
       <div class="no-data">読み込み中…</div>
@@ -135,17 +134,14 @@
     <div id="map"></div>
   </div>
 
-
   <div id="imageViewer" onclick="closeViewer()">
     <img id="viewerImage" src="" alt="拡大画像">
   </div>
-
 
   <script>
     let allData = [];
     let map;
     let markerGroup;
-
 
     function initMap() {
       map = L.map('map', { zooming: true, touchZoom: true }).setView([35.6812, 139.7671], 10);
@@ -180,7 +176,6 @@
      }, 300); // 300ミリ秒入力が止まったら検索を実行
     });
 
-
     // 住所検索の除外
     function filterData(keyword) {
       if (!keyword.trim()) {
@@ -188,9 +183,7 @@
         return;
       }
 
-
       const searchWords = keyword.toLowerCase().split(/[\s,、]+/);
-
 
       const filtered = allData.filter(function(row) {
         if (!row) return false;
@@ -201,10 +194,8 @@
         return searchWords.every(function(word) { return targetText.indexOf(word) !== -1; });
       });
 
-
       renderData(filtered);
     }
-
 
     // 表示処理
     function renderData(data) {
@@ -212,22 +203,17 @@
       listContainer.innerHTML = '';
       markerGroup.clearLayers();
 
-
       if (!data || data.length === 0) {
         listContainer.innerHTML = '<div class="no-data">該当するデータがありません</div>';
         return;
       }
 
-
       const bounds = [];
-
 
       data.forEach(function(row) {
         if (!row || !row['座標']) return;
 
-
         const imgUrl = row['画像'] ? row['画像'].toString() : 'https://placehold.co/120x120?text=No+Image';
-
 
         const card = document.createElement('div');
         card.className = 'data-card';
@@ -254,14 +240,12 @@
        
         card.appendChild(info);
 
-
         // 詳細
         const detailDiv = document.createElement('div');
         detailDiv.className = 'card-detail';
         detailDiv.innerHTML = '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' +
                               '<b>撮影日:</b> ' + (row['撮影日'] || '-').split('T')[0];
         info.appendChild(detailDiv);
-
 
         card.addEventListener('click', function() {
           // 他に開いているカードがあれば閉じる
@@ -271,7 +255,6 @@
          
           // このカードを開閉する
           card.classList.toggle('active');
-
 
           // 地図の移動処理
           const parts = row['座標'].toString().split(',');
@@ -284,9 +267,7 @@
           }
         });
 
-
         listContainer.appendChild(card);
-
 
         const parts = row['座標'].toString().split(',');
         if (parts.length === 2) {
@@ -312,12 +293,10 @@
         }
       });
 
-
       if (bounds.length > 0 && map) {
         map.fitBounds(bounds, { padding: [30, 30] });
       }
     }
-
 
     function openViewer(src) {
       if (src.indexOf('placehold.co') !== -1) return;
@@ -326,7 +305,6 @@
       img.src = src;
       viewer.classList.add('show');
     }
-
 
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
