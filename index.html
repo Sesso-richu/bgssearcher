@@ -153,21 +153,44 @@
 
     window.onload = function() {
       initMap();
-      const spreadsheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
-      const sheetName = 'シート1';
-      const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbxnsnZYRMkQtn-lmZ-qzdJCIk4LcUcADm04vmGXqjx7y4F5h1UvJgrHpAWc1ayKia7L/exec'; 
+      fetch(gasUrl)
+        .then(response => {
+          if (!response.ok) throw new Error('通信エラー: ' + response.status);
+          return response.json();
+        })
+        .then(data => {
+          // 1行目の見出しを取得して切り離す
+          const headers = data.shift(); 
+          
+          // データを地図用の形に自動変換
+          const formattedData = data.map(row => {
+            const item = {};
+            headers.forEach((h, i) => {
+              item[h] = row[i];
+            });
+            
+            // 座標を緯度経度に分解
+            if (item['座標']) {
+              const coords = item['座標'].split(',');
+              if (coords.length >= 2) {
+                item['緯度'] = parseFloat(coords[0].trim());
+                item['経度'] = parseFloat(coords[1].trim());
+              }
+            }
+            item['名称'] = item['地名'] || item['道路名'] || '無名のスポット';
+            return item;
+          }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
 
-      fetch(url)
-        .then(response => response.text())
-        .then(text => {
-          const data = parseGoogleSheetResponse(text); 
+          // 地図にデータを渡す
+          allData = formattedData;
           renderData(allData);
         })
-        .catch(error => {
-          console.error('データの取得に失敗しました:', error);
-          alert('スプレッドシートからデータを取得できませんでした');
+        .catch(err => {
+          document.getElementById('listContainer').innerHTML = 
+            '<div class="no-data">エラー原因: ' + err.message + '</div>';
+          console.error(err);
         });
-  
     };
        
     let searchTimeout;
