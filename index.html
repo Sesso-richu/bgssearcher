@@ -151,72 +151,58 @@
       markerGroup = L.layerGroup().addTo(map);
     }
 
+    window.google = { 
+      visualization: { 
+        Query: { 
+          setResponse: function(obj) { 
+            window.handleGoogleResponse(obj); } } } };
+
     window.onload = function() {
       initMap();
+      window.handleGoogleResponse = function(obj) {
+        try {
+          if (!obj || !obj.table) throw new Error('データ空');
+          const table = obj.table;
+          const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
 
-      window.google = {
-        visualization: {
-          Query: {
-            setResponse: function(obj) {
-              try {
-                if (obj.status === 'error') throw new Error(obj.errors[0].message);
-                if (!obj || !obj.table) throw new Error('データが空っぽです');
-                
-                const table = obj.table;
-                let headers = [];
-                let dataRows = [];
-                
-                // Googleの気まぐれに対応（見出しの位置を自動探知）
-                if (table.cols && table.cols[0] && table.cols[0].label) {
-                  headers = table.cols.map(c => String(c.label || '').trim());
-                  dataRows = table.rows;
-                } else if (table.rows && table.rows.length > 0) {
-                  headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
-                  dataRows = table.rows.slice(1);
-                }
+          const dataRows = table.rows.slice(1);
+          const formattedData = dataRows.map(row => {
+            const item = {};
+            row.c.forEach((cell, index) => {
+              const header = headers[index];
+              if (header) item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
+            });
 
-                const formattedData = dataRows.map(row => {
-                  const item = {};
-                  row.c.forEach((cell, index) => {
-                    const header = headers[index];
-                    if (header) {
-                      item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
-                    }
-                  });
-
-                  if (item['座標']) {
-                    const coords = String(item['座標']).split(/[、,，\s]+/);
-                    if (coords.length >= 2) {
-                      item['緯度'] = parseFloat(coords[0]);
-                      item['経度'] = parseFloat(coords[1]);
-                    }
-                  }
-                  item['名称'] = item['地名'] || item['道路名'] || '無名のスポット';
-                  return item;
-                }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
-
-                // 通信は成功したけれどデータがうまく変換できなかった場合
-                if (formattedData.length === 0) {
-                  formattedData.push({'名称': '通信成功！しかしデータ0件（日本橋）', '緯度': 35.6827736, '経度': 139.7733608, '地名': '日本橋'});
-                }
-                
-                allData = formattedData;
-                renderData(allData);
-              } catch (err) {
-                document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">変換エラー: ' + err.message + '</div>';
+            if (item['座標']) {
+              const coords = String(item['座標']).split(/[、,，\s]+/);
+              if (coords.length >= 2) {
+                item['緯度'] = parseFloat(coords[0]);
+                item['経度'] = parseFloat(coords[1]);
               }
             }
+            item['名称'] = item['地名'] || item['道路名'] || '無名のスポット';
+            return item;
+          }).filter(item => !isNaN(item['緯度']) && !isNaN(item['経度']));
+
+          if (formattedData.length === 0) {
+            document.getElementById('listContainer').innerHTML = '<div class="no-data">データ変換に失敗している可能性があります</div>';
+            return;
           }
+
+          allData = formattedData;
+          renderData(allData);
+        } catch (err) {
+          document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">エラー: ' + err.message + '</div>';
         }
       };
 
+      // データの読み込み開始
       const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
       const script = document.createElement('script');
       script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
       script.onerror = function() {
-        document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">【通信ブロック】<br>スプレッドシートの右上「共有」から、一般的なアクセスを「リンクを知っている全員」に変更してください。<br>またはシートIDのコピペミスがないか確認してください。</div>';
+        document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">通信ブロックが発生しました</div>';
       };
-      
       document.body.appendChild(script);
     };
      
