@@ -311,7 +311,7 @@
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
     }
-    
+
     function parseGoogleSheetResponse(text) {
       const rawData = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
       if (!rawData) return [];
@@ -319,18 +319,32 @@
       const obj = JSON.parse(rawData[1]);
       const table = obj.table;
   
-      // 1行目の見出しを取得
       const headers = table.rows[0] ? table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v) : '') : '') : [];
   
-      // 2行目以降のデータをオブジェクトの配列に変換
       const dataRows = table.rows.slice(1);
       return dataRows.map(row => {
         const item = {};
         row.c.forEach((cell, index) => {
           const header = headers[index];
-          if (header) { item[header] = cell ? (cell.v !== null ? cell.v : '') : '';
+          if (header) {
+            item[header] = cell ? (cell.v !== null ? cell.v : '') : '';
           }
         });
+    
+        if (item['座標']) {
+          const coords = item['座標'].split(',');
+          if (coords.length >= 2) {
+            item['緯度'] = coords[0].trim();
+            item['経度'] = coords[1].trim();
+          }
+        }
+    
+        if (item['地名']) {
+          item['名称'] = item['地名'];
+        } else if (item['道路名']) {
+          item['名称'] = item['道路名'];
+        }
+    
         return item;
       });
     }
