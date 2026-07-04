@@ -157,9 +157,9 @@
     window.onload = function() {
       initMap();
       fetch(GAS_WEB_APP_URL)
-        .then(response => response.json())
-        .then(data => {
-          allData = data;
+        .then(response => response.text())
+        .then(text => {
+          allData = JSON.parse(text);
           renderData(allData);
         })
         .catch(err => {
