@@ -312,67 +312,18 @@
       document.getElementById('imageViewer').classList.remove('show');
     }
 
-    function parseGoogleSheetResponse(t){
-      try{
-        var e=t.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
-        if(!e)return[];
-        var r=JSON.parse(e[1]).table,n=[];
-        if(r&&r.rows&&r.rows.length>0){
-          var a=[];
-          if(r.rows[0]&&r.rows[0].c){
-            for(var o=0;o<r.rows[0].c.length;o++){
-              var i=r.rows[0].c[o];
-              a.push(i?i.v!==null?String(i.v):"":"");
-            }
-          }
-          
-          for(var c=1;c<r.rows.length;c++){
-            var l=r.rows[c];
-            if(l&&l.c){
-              var s={};
-              for(var g=0;g<l.c.length;g++){
-                var u=a[g];
-                if(u){
-                  var d=l.c[g];
-                  s[u]=d?d.v!==null?String(d.v):"":"";
-                }
-              }
-              
-              if(s["座標"]){
-                var v=s["座標"].split(",");
-                if(v.length>=2){
-                  s["緯度"]=parseFloat(v[0]);
-                  s["経度"]=parseFloat(v[1]);
-                }
-              }
-              
-              s["名称"]=s["地名"]||s["道路名"]||"無名のスポット";
-              if(!isNaN(s["緯度"])&&!isNaN(s["経度"])){
-                n.push(s)
-              }
-            }
-          }
-          
-          if (n.length === 0){
-            n.push({
-              名称:"テスト",
-              緯度:35.6827736,
-              経度:139.7733608,
-              地名:"日本橋"
-            });
-          }
+    fetch('https://script.google.com/macros/s/AKfycbxuPXVjdtXBDVUP5j7gyG5I3t-7jcUy3XmIfGowXq2FrzbkKtl0W6Hfc9ERRPqOiwzh/exec')
+      .then(response => response.json())
+      .then(data => {
+        var header = data.shift(); 
+        var formattedData = data.map(row => {
+          var item = {};
+          header.forEach((h, i) => item[h] = row[i]);
+          return item;
+        });
+        renderData(formattedData);
+      });
 
-          return n;
-        } catch(f){
-          return [{
-            名称:"テスト",
-            緯度:35.6827736,
-            経度:139.7733608,
-            地名:"日本橋"
-          }];
-        }
-    }
-    
   </script>
 </body>
 </html>
