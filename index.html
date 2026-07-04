@@ -153,7 +153,7 @@
 
     window.onload = function() {
     initMap();
-    const gasUrl = 'https://script.google.com/macros/s/AKfycbxnsnZYRMkQtn-1mZ-qzdJCIk4LcUcADm04vmGXqjx7y4F5h1UvJgrHpAWc1ayKia7L/exec';
+    const gasUrl = 'https://script.google.com/macros/s/AKfycby2H_2OWkDya9cRYtCET0w-r_aK3bipk8mslw0yD8OB_XLk8AdQVPJirzH1Rmxw_Yk4/exec';
 
     fetch(gasUrl)
     .then(response => {
@@ -346,19 +346,6 @@
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
     }
-
-    fetch('https://script.google.com/macros/s/AKfycbxuPXVjdtXBDVUP5j7gyG5I3t-7jcUy3XmIfGowXq2FrzbkKtl0W6Hfc9ERRPqOiwzh/exec')
-      .then(response => response.json())
-      .then(data => {
-        var header = data.shift(); 
-        var formattedData = data.map(row => {
-          var item = {};
-          header.forEach((h, i) => item[h] = row[i]);
-          return item;
-        });
-        renderData(formattedData);
-      });
-
   </script>
 </body>
 </html>
