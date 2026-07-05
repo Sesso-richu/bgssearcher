@@ -29,7 +29,7 @@
       max-height: 600px;
     }
    
-    // 左側表
+    /* 左側表 */
     .list-container {
       width: 50%;
       min-width: 50%;
@@ -45,7 +45,7 @@
       box-sizing: border-box;
     }
    
-    // 表
+    /* 表 */
     .data-card {
       display: flex;
       background: white;
@@ -70,13 +70,13 @@
     .card-name { font-size: 14px; font-weight: bold; color: #2c3e50; margin: 0; }
     .card-address { font-size: 12px; color: #7f8c8d; margin: 0; }
    
-    // 詳細用デザイン
+    /* 詳細用デザイン */
     .card-detail { font-size: 12px; color: #34495e; margin: 4px 0 0 0; padding-top: 4px; border-top: 1px dashed #ddd; display: none; }
-    .data-card.active .card-detail { display: block; } // クリックされたら表示する
+    .data-card.active .card-detail { display: block; } /* クリックされたら表示する */
     .search-container { text-align: left; }
     .card-detail { max-height: 120px; overflow-y: auto; padding-right: 5px; }
    
-    // 右側地図
+    /* 右側地図 */
     #map {
       flex: 1;
       height: 600px;
@@ -90,33 +90,31 @@
     #imageViewer.show { display: flex; }
     #viewerImage { max-width: 90%; max-height: 90%; border-radius: 4px; }
 
-
     .data-card.highlight { background: #fff3c2 !important; border: 1px solid #ffeda3; }
 
-
-// スマホ画面（幅768px以下）のレイアウト変更
+    /* スマホ画面（幅768px以下）のレイアウト変更 */
     @media screen and (max-width: 768px) {
       .content-wrapper {
-        flex-direction: column; // 縦並びに変更
-        height: calc(95vh - 70px); // 検索窓の高さを引いた画面いっぱいに設定
+        flex-direction: column;
+        height: calc(95vh - 70px);
         max-height: none;
       }
       
       #map {
-        order: 1; // 地図を上に配置
+        order: 1;
         width: 100%;
-        height: 40vh !important; // 地図の高さを画面の約4割に設定
+        height: 40vh !important;
         flex: none;
       }
       
       .list-container {
-        order: 2; // リストを下に配置
+        order: 2;
         width: 100%;
         min-width: 100%;
         max-width: 100%;
         height: auto !important;
         max-height: none !important;
-        flex: 1; // 残りの高さをすべてリスト領域にする
+        flex: 1;
         padding-right: 0;
       }
     }
@@ -155,14 +153,23 @@
       visualization: { 
         Query: { 
           setResponse: function(obj) { 
-            window.handleGoogleResponse(obj); } } } };
+            window.handleGoogleResponse(obj); 
+          } 
+        } 
+      } 
+    };
 
     window.onload = function() {
       initMap();
 
       window.handleGoogleResponse = function(obj) {
         try {
+          // アクセス拒否などのGoogle側のエラーを明確にキャッチ
+          if (obj.status === 'error') {
+            throw new Error('スプレッドシートのアクセス権限エラー: ' + (obj.errors[0].message || ''));
+          }
           if (!obj || !obj.table) throw new Error('データ空');
+          
           const table = obj.table;
           const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
 
@@ -190,18 +197,17 @@
           }).filter(item => item !== null && !isNaN(item['緯度']) && !isNaN(item['経度']));
 
           if (formattedData.length === 0) {
-            document.getElementById('listContainer').innerHTML = '<div class="no-data">データは取得できましたが、表示できるデータが0件です</div>';
+            document.getElementById('listContainer').innerHTML = '<div class="no-data">データは取得できましたが、表示できるデータが0件です（「座標」という列名が存在しない可能性があります）</div>';
             return;
           }
 
           allData = formattedData;
           renderData(allData);
         } catch (err) {
-          document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">エラー: ' + err.message + '</div>';
+          document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">エラー: ' + err.message + '</div>';
         }
       };
 
-      // 変数名を sheetId に統一しました
       const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
       const script = document.createElement('script');
       script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
@@ -213,10 +219,9 @@
      clearTimeout(searchTimeout);
      searchTimeout = setTimeout(() => {
        filterData(this.value);
-     }, 300); // 300ミリ秒入力が止まったら検索を実行
+     }, 300);
     });
 
-    // 住所検索の除外
     function filterData(keyword) {
       if (!keyword.trim()) {
         renderData(allData);
@@ -237,7 +242,6 @@
       renderData(filtered);
     }
 
-    // 表示処理
     function renderData(data) {
       const listContainer = document.getElementById('listContainer');
       listContainer.innerHTML = '';
@@ -280,7 +284,6 @@
        
         card.appendChild(info);
 
-        // 詳細
         const detailDiv = document.createElement('div');
         detailDiv.className = 'card-detail';
         detailDiv.innerHTML = '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' +
@@ -288,47 +291,47 @@
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
-          // 他に開いているカードがあれば閉じる
           document.querySelectorAll('.data-card.active').forEach(c => {
             if (c !== card) c.classList.remove('active');
           });
-         
-          // このカードを開閉する
           card.classList.toggle('active');
 
-          // 地図の移動処理
-          const parts = row['座標'].toString().split(',');
-          if (parts.length === 2) {
-            const lat = Number(parts[0]);
-            const lng = Number(parts[1]);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              map.setView([lat, lng], 16);
+          if (row['座標']) {
+            const parts = row['座標'].toString().split(',');
+            if (parts.length === 2) {
+              const lat = Number(parts[0]);
+              const lng = Number(parts[1]);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                map.setView([lat, lng], 16);
+              }
             }
           }
         });
 
         listContainer.appendChild(card);
 
-        const parts = row['座標'].toString().split(',');
-        if (parts.length === 2) {
-          const lat = Number(parts[0]);
-          const lng = Number(parts[1]);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const marker = L.marker([lat, lng],{ shadowPane: '' });
-            marker.options.shadowUrl = '';
-            const noShadowIcon = L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', shadowUrl: '' });
-            noShadowIcon.options.iconSize = [25, 41];
-            noShadowIcon.options.iconAnchor = [12, 41];
-            marker.setIcon(noShadowIcon);
-            markerGroup.addLayer(marker);
-            marker.on('click', function() {
-              document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
-              document.querySelectorAll('.data-card.highlight').forEach(c => c.classList.remove('highlight'));
-              card.classList.add('highlight');
-              card.classList.add('active');
-              card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            });
-            bounds.push([lat, lng]);
+        if (row['座標']) {
+          const parts = row['座標'].toString().split(',');
+          if (parts.length === 2) {
+            const lat = Number(parts[0]);
+            const lng = Number(parts[1]);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const marker = L.marker([lat, lng],{ shadowPane: '' });
+              marker.options.shadowUrl = '';
+              const noShadowIcon = L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', shadowUrl: '' });
+              noShadowIcon.options.iconSize = [25, 41];
+              noShadowIcon.options.iconAnchor = [12, 41];
+              marker.setIcon(noShadowIcon);
+              markerGroup.addLayer(marker);
+              marker.on('click', function() {
+                document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
+                document.querySelectorAll('.data-card.highlight').forEach(c => c.classList.remove('highlight'));
+                card.classList.add('highlight');
+                card.classList.add('active');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              });
+              bounds.push([lat, lng]);
+            }
           }
         }
       });
