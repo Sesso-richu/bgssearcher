@@ -18,7 +18,7 @@
       min-height: 100vh;
     }
     .main-content{
-      padding: 15px 15px 40px 15px;
+      padding: 15px;
       flex: 1;
     }
     h2 { color: #2c3e50; margin: 0 0 15px 0; font-size: 18px; text-align: center; }
@@ -31,8 +31,8 @@
       flex-direction: row;
       gap: 15px;
       width: 100%;
-      height: 600px;
-      max-height: 600px;
+      height: 60vh;
+      min-height: 400px;
     }
    
     /* 左側表 */
@@ -40,7 +40,7 @@
       width: 50%;
       min-width: 50%;
       max-width: 50%;
-      height: 600px;
+      height: 100%;
       max-height: 600px;
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
@@ -85,7 +85,7 @@
     /* 右側地図 */
     #map {
       flex: 1;
-      height: 600px;
+      height: 100%;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       border: 1px solid #eef2f5;
@@ -104,15 +104,13 @@
         flex-direction: column;
         height: calc(95vh - 70px);
         max-height: none;
-      }
-      
+      }    
       #map {
         order: 1;
         width: 100%;
         height: 40vh !important;
         flex: none;
-      }
-      
+      }    
       .list-container {
         order: 2;
         width: 100%;
@@ -124,7 +122,6 @@
         padding-right: 0;
       }
     }
-  
     .custom-header {
       background-image: url('https://i.ibb.co/nNjY2Pb1/IMG-2886.jpg');
       background-size: cover;
@@ -156,7 +153,6 @@
       margin: 0;
       opacity: 0.9;
     }
-
     .nav-bar {
       background: #2c3e50;
       display: flex;
@@ -173,16 +169,12 @@
     .nav-bar a:hover {
       opacity: 0.7;
     }
-
     .custom-footer {
       background: #2c3e50;
       color: #bdc3c7;
       text-align: center;
       padding: 20px;
       font-size: 13px;
-      clear: both;
-      position: relative;
-      z-index: 10;
     }
   </style>
 </head>
