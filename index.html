@@ -163,40 +163,39 @@
         try {
           if (!obj || !obj.table) throw new Error('データ空');
           const table = obj.table;
-          const COORD_COL_INDEX = 8; 
-          const NAME_COL_INDEX = 3;
+          
+          // 1行目の見出しの文字（座標、道路名、地名など）を綺麗に取得
+          const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
           const dataRows = table.rows.slice(1);
           const formattedData = dataRows.map(row => {
             if (!row || !row.c) return null;
             const item = {};
 
-            // 1. 指定された列から直接「座標」をぶっこ抜く
-            const coordCell = row.c[COORD_COL_INDEX];
-            if (coordCell && coordCell.v !== null) {
-              const coords = String(coordCell.v).split(/[、,，\s]+/);
+            // 元のスプレッドシートの見出しの名前のまま、すべてのデータをコピー
+            row.c.forEach((cell, index) => {
+              const header = headers[index];
+              if (header) {
+                item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
+              }
+            });
+
+            // 座標を自動で緯度・経度に変換
+            if (item['座標']) {
+              const coords = String(item['座標']).split(/[、,，\s]+/);
               if (coords.length >= 2) {
                 item['緯度'] = parseFloat(coords[0]);
                 item['経度'] = parseFloat(coords[1]);
-                // 元のrenderDataが「row['座標']」を直接文字分割して使う仕様になっているため、ここでも復元
-                item['座標'] = String(coordCell.v);
               }
             }
-
-            // 2. 指定された列から直接「名前」をぶっこ抜く
-            const nameCell = row.c[NAME_COL_INDEX];
-            item['名称'] = (nameCell && nameCell.v !== null) ? String(nameCell.v).trim() : '無名のスポット';
             
-            // 3. 既存のrenderDataがクラッシュしないよう、空の器だけ用意
-            item['道路名'] = item['名称'];
-            item['地名'] = '';
-            item['住所'] = '';
-
+            // 地図のピン名を設定
+            item['名称'] = item['道路名'] || item['地名'] || '無名のスポット';
             return item;
           }).filter(item => item !== null && !isNaN(item['緯度']) && !isNaN(item['経度']));
 
           if (formattedData.length === 0) {
             document.getElementById('listContainer').innerHTML = 
-              '<div class="no-data">列の番号設定（COORD_COL_INDEX）が実際のシートとズレている可能性があります</div>';
+              '<div class="no-data">データは届きましたが、1行目の「座標」という列名が一致していない可能性があります</div>';
             return;
           }
 
@@ -209,7 +208,7 @@
 
       const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
       const script = document.createElement('script');
-      script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
+      script.src = 'https://docs.google.com/spreadsheets/d/' + scriptId + '/gviz/tq?tqx=out:json&sheet=シート1';
       document.body.appendChild(script);
     };
     
