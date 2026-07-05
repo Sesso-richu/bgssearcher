@@ -178,7 +178,7 @@
     }
     .custom-square-marker {
       background-color: #3250a8;
-      border: 2px solid #ffffff;
+      border: 1px solid #ffffff;
       border-radius: 0;
       box-sizing: border-box;
     }
@@ -375,10 +375,23 @@
        
         card.appendChild(info);
 
+        let displayDate = row['撮影日'] || '-';
+        if (displayDate.indexOf('Date(') !== -1) {
+          const matches = displayDate.match(/Date\((\d+),(\d+),(\d+)/);
+          if (matches) {
+            const y = matches[1];
+            const m = String(Number(matches[2]) + 1).padStart(2, '0');
+            const d = matches[3].padStart(2, '0');
+            displayDate = y + '年' + m + '月' + d + '日';
+          }
+        } else {
+          displayDate = displayDate.split('T')[0]; // 予備
+        }
+
         const detailDiv = document.createElement('div');
         detailDiv.className = 'card-detail';
         detailDiv.innerHTML = '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' +
-                              '<b>撮影日:</b> ' + (row['撮影日'] || '-').split('T')[0];
+                              '<b>撮影日:</b> ' + displayDate;
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
