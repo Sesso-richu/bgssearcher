@@ -164,16 +164,25 @@
 
       window.handleGoogleResponse = function(obj) {
         try {
-          // アクセス拒否などのGoogle側のエラーを明確にキャッチ
           if (obj.status === 'error') {
             throw new Error('スプレッドシートのアクセス権限エラー: ' + (obj.errors[0].message || ''));
           }
           if (!obj || !obj.table) throw new Error('データ空');
           
           const table = obj.table;
-          const headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
+          let headers = [];
+          let dataRows = [];
+          
+          // 💡【修正箇所】Googleの仕様に合わせて、見出しを正しい場所から取り出す
+          if (table.cols && table.cols.some(c => c.label)) {
+            headers = table.cols.map(c => c.label ? String(c.label).trim() : '');
+            dataRows = table.rows; // データはそのまま使用
+          } else {
+            // 万が一の予備ルート
+            headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
+            dataRows = table.rows.slice(1);
+          }
 
-          const dataRows = table.rows.slice(1);
           const formattedData = dataRows.map(row => {
             if (!row || !row.c) return null;
             const item = {};
@@ -213,7 +222,7 @@
       script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
       document.body.appendChild(script);
     };
-    
+  
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', function() {
      clearTimeout(searchTimeout);
