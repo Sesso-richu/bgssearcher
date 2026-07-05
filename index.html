@@ -400,12 +400,11 @@
             const lat = Number(parts[0]);
             const lng = Number(parts[1]);
             if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.circleMarker([lat, lng], {
-                radius: 6,           // 点の半径
-                fillColor: "#3498db", // 点の内側の色
-                color: "#ffffff",     // 外枠の色
-                weight: 2,           // 外枠の太さ
-                opacity: 1,
+              const bounds = [[lat - 0.0001, lng - 0.0001], [lat + 0.0001, lng + 0.0001]]; // 座標を中心に小さな範囲を定義
+              const marker = L.rectangle(bounds, {
+                color: "#3250a8",    // 枠の色
+                weight: 1,           // 枠の太さ
+                fillColor: "#3250a8",// 中の色
                 fillOpacity: 0.8
               });
               markerGroup.addLayer(marker);
