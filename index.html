@@ -9,11 +9,17 @@
   <style>
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      margin: 15px;
+      margin: 0;
+      padding: 0;
       background: #ffffff;
       color: #333;
-      overflow: hidden;
-      height: 95vh;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .main-content{
+      padding: 15px;
+      flex: 1;
     }
     h2 { color: #2c3e50; margin: 0 0 15px 0; font-size: 18px; text-align: center; }
     .search-container { margin-bottom: 15px; text-align: center; }
@@ -118,9 +124,80 @@
         padding-right: 0;
       }
     }
+  
+    .custom-header {
+      background-image: url('https://ibb.co/Z6q6wxJd');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .custom-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55); /* 画像を少し暗くして文字を目立たせる */
+    }
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+    .header-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      letter-spacing: 2px;
+    }
+    .header-desc {
+      font-size: 16px;
+      font-weight: 300;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .nav-bar {
+      background: #2c3e50;
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .nav-bar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 15px;
+      transition: opacity 0.2s;
+    }
+    .nav-bar a:hover {
+      opacity: 0.7;
+    }
+
+    .custom-footer {
+      background: #2c3e50;
+      color: #bdc3c7;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
+  <header class="custom-header">
+    <div class="header-content">
+      <h1 class="header-title">青看板検索ツール</h1>
+      <p class="header-desc">道路案内標識（青看板）の地名を入力すると地名を含む青看板がヒットします</p>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a href="index.html">マップ検索</a>
+    <a href="updates.html">更新情報</a>
+  </nav>
+
+  <div class="main-content">
+
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="地名を入力…">
   </div>
@@ -131,6 +208,10 @@
     </div>
     <div id="map"></div>
   </div>
+
+  <footer class="custom-footer">
+    <small>&copy; 2026 bgssearcher developed by Sesso(セッソー)</small>
+  </footer>
 
   <div id="imageViewer" onclick="closeViewer()">
     <img id="viewerImage" src="" alt="拡大画像">
