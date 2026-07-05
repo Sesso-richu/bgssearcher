@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>更新情報 - 青看板検索ツール</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .custom-header {
+      background-image: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .custom-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+    .header-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      letter-spacing: 2px;
+    }
+    .header-desc {
+      font-size: 16px;
+      font-weight: 300;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .nav-bar {
+      background: #2c3e50;
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .nav-bar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 15px;
+      transition: opacity 0.2s;
+    }
+    .nav-bar a:hover {
+      opacity: 0.7;
+    }
+
+    .custom-footer {
+      background: #2c3e50;
+      color: #bdc3c7;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      margin-top: auto; /* フッターを常に一番下に押しやる */
+    }
+
+    .main-content {
+      padding: 40px 20px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .updates-container {
+      background: #ffffff;
+      max-width: 800px;
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    .updates-title {
+      font-size: 24px;
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    .update-item {
+      border-bottom: 1px dashed #ecf0f1;
+      padding: 15px 0;
+    }
+    .update-item:last-child {
+      border-bottom: none;
+    }
+
+    .update-date {
+      font-size: 14px;
+      font-weight: bold;
+      color: #3498db;
+      margin-bottom: 5px;
+    }
+
+    .update-text {
+      font-size: 15px;
+      color: #34495e;
+      line-height: 1.6;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="custom-header">
+    <div class="header-content">
+      <h1 class="header-title">青看板検索ツール</h1>
+      <p class="header-desc">道路案内標識（青看板）の地名を入力するとその地名を含む青看板がヒットします</p>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a href="index.html">マップ検索</a>
+    <a href="updates.html">更新情報</a>
+  </nav>
+
+  <!-- メインコンテンツ（更新情報エリア） -->
+  <div class="main-content">
+    <div class="updates-container">
+      <h2 class="updates-title">更新情報</h2>
+
+      <!-- 更新履歴 1 -->
+      <div class="update-item">
+        <div class="update-date">2026年07月05日</div>
+        <p class="update-text">マップ上のマーカーを「ピン」から「正方形」の表示に変更し、視認性を向上させました。</p>
+      </div>
+
+      <!-- 更新履歴 2 -->
+      <div class="update-item">
+        <div class="update-date">2026年07月05日</div>
+        <p class="update-text">サイト全体のデザインを刷新し、ヘッダー・フッターおよびナビゲーションメニューを追加しました。</p>
+      </div>
+
+      <!-- 更新履歴 3 -->
+      <div class="update-item">
+        <div class="update-date">2026年07月04日</div>
+        <p class="update-text">スプレッドシートとの連携システムを安定版にアップデートしました。位置情報の読み込みエラーが解消されています。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="custom-footer">
+    <small>created by セッソー</small>
+  </footer>
+
+</body>
+</html>
