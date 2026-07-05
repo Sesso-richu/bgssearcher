@@ -175,6 +175,13 @@
       padding: 20px;
       font-size: 13px;
     }
+    .custom-square-marker {
+      background-color: #3250a8;
+      border: 2px solid #ffffff;
+      border-radius: 0;
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -400,13 +407,12 @@
             const lat = Number(parts[0]);
             const lng = Number(parts[1]);
             if (!isNaN(lat) && !isNaN(lng)) {
-              const bounds = [[lat - 0.0001, lng - 0.0001], [lat + 0.0001, lng + 0.0001]]; // 座標を中心に小さな範囲を定義
-              const marker = L.rectangle(bounds, {
-                color: "#3250a8",    // 枠の色
-                weight: 1,           // 枠の太さ
-                fillColor: "#3250a8",// 中の色
-                fillOpacity: 0.8
+              const squareIcon = L.divIcon({
+                className: 'custom-square-marker', // CSSでデザインするためのクラス名
+                iconSize: [12, 12],                // 正方形のサイズ [横幅, 縦幅]（ピクセル）
+                iconAnchor: [6, 6]                 // アイコンの中心点を座標に合わせる設定
               });
+              const marker = L.marker([lat, lng], { icon: squareIcon });
               markerGroup.addLayer(marker);
               marker.on('click', function() {
                 document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
