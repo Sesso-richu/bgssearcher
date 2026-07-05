@@ -248,12 +248,12 @@
           let headers = [];
           let dataRows = [];
           
-          // 💡【修正箇所】Googleの仕様に合わせて、見出しを正しい場所から取り出す
+          // 見出しを取り出す
           if (table.cols && table.cols.some(c => c.label)) {
             headers = table.cols.map(c => c.label ? String(c.label).trim() : '');
             dataRows = table.rows; // データはそのまま使用
           } else {
-            // 万が一の予備ルート
+            // 予備ルート
             headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
             dataRows = table.rows.slice(1);
           }
@@ -400,12 +400,14 @@
             const lat = Number(parts[0]);
             const lng = Number(parts[1]);
             if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng],{ shadowPane: '' });
-              marker.options.shadowUrl = '';
-              const noShadowIcon = L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', shadowUrl: '' });
-              noShadowIcon.options.iconSize = [25, 41];
-              noShadowIcon.options.iconAnchor = [12, 41];
-              marker.setIcon(noShadowIcon);
+              const marker = L.circleMarker([lat, lng], {
+                radius: 6,           // 点の半径
+                fillColor: "#3498db", // 点の内側の色
+                color: "#ffffff",     // 外枠の色
+                weight: 2,           // 外枠の太さ
+                opacity: 1,
+                fillOpacity: 0.8
+              });
               markerGroup.addLayer(marker);
               marker.on('click', function() {
                 document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
