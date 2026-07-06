@@ -402,19 +402,19 @@
           document.querySelectorAll('.data-card.highlight').forEach(c => { if (c !== card) c.classList.remove('highlight'); });
           document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
           markerGroup.eachLayer(function(layer){
-            if (layer.setZIndexOffset) layer.setZIndexOffset(0) !important;
+            if (layer.setZIndexOffset) layer.setZIndexOffset(0);
           });
           const isActive = card.classList.toggle('active');
           if (isActive) {
             card.classList.add('highlight');
             if (card.associatedMarker && card.associatedMarker.getElement()){
               card.associatedMarker.getElement().classList.add('selected');
-              card.associatedMarker.setZIndexOffset(1000) !important;
+              card.associatedMarker.setZIndexOffset(1000);
             }
           } else {
             card.classList.remove('highlight');
             if (card.associatedMarker){
-              card.associatedMarker.setZIndexOffset(0) !important;
+              card.associatedMarker.setZIndexOffset(0);
             }
           }
           
