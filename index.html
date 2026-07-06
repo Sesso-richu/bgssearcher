@@ -123,7 +123,7 @@
       }
     }
     .custom-header {
-      background-image: url('https://i.ibb.co/NnCPvQ4s/IMG-2902.jpg');
+      background-image: url('https://i.ibb.co/zh21tn7g/IMG-2912.jpg');
       background-size: cover;
       background-position: center;
       position: relative;
@@ -181,6 +181,10 @@
       border: 1px solid #ffffff;
       border-radius: 0;
       box-sizing: border-box;
+    }
+    .custom-square-marker.selected {
+      background-color: #ffa333 !important;
+      z-index: 1000 !important;
     }
   </style>
 </head>
@@ -243,7 +247,6 @@
 
     window.onload = function() {
       initMap();
-
       window.handleGoogleResponse = function(obj) {
         try {
           if (obj.status === 'error') {
@@ -399,11 +402,14 @@
             if (c !== card) c.classList.remove('active');
           });
           document.querySelectorAll('.data-card.highlight').forEach(c => { if (c !== card) c.classList.remove('highlight'); });
+          document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
           const isActive = card.classList.toggle('active');
           if (isActive) {
             card.classList.add('highlight');
+            if (card.associatedMarker && card.associatedMarker._icon){
+              card.associatedMarker._icon.classList.add('selected'); }
           } else {
-            card.classList.remove('highlight');
+            card.classList.remove('highlight');  
           }
           
           if (row['座標']) {
@@ -427,11 +433,12 @@
             const lng = Number(parts[1]);
             if (!isNaN(lat) && !isNaN(lng)) {
               const squareIcon = L.divIcon({
-                className: 'custom-square-marker', // CSSでデザインするためのクラス名
-                iconSize: [12, 12],                // 正方形のサイズ [横幅, 縦幅]（ピクセル）
-                iconAnchor: [6, 6]                 // アイコンの中心点を座標に合わせる設定
+                className: 'custom-square-marker',
+                iconSize: [12, 12],                // [横幅, 縦幅]（ピクセル）
+                iconAnchor: [6, 6]                 // 中心点を座標に合わせる
               });
               const marker = L.marker([lat, lng], { icon: squareIcon });
+              card.associatedMarker = marker;
               markerGroup.addLayer(marker);
               marker.on('click', function() {
                 document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
@@ -439,6 +446,10 @@
                 card.classList.add('highlight');
                 card.classList.add('active');
                 card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
+                if (e.target._icon) {
+                  e.target._icon.classList.add('selected');
+                }
               });
               bounds.push([lat, lng]);
             }
