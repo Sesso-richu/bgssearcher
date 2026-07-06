@@ -183,7 +183,7 @@
       box-sizing: border-box;
     }
     .custom-square-marker.selected {
-      background-color: #ffa333 !important;
+      background-color: #ff850a !important;
       z-index: 1000 !important;
     }
   </style>
@@ -398,16 +398,14 @@
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
-          document.querySelectorAll('.data-card.active').forEach(c => {
-            if (c !== card) c.classList.remove('active');
-          });
+          document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
           document.querySelectorAll('.data-card.highlight').forEach(c => { if (c !== card) c.classList.remove('highlight'); });
           document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
           const isActive = card.classList.toggle('active');
           if (isActive) {
             card.classList.add('highlight');
-            if (card.associatedMarker && card.associatedMarker._icon){
-              card.associatedMarker._icon.classList.add('selected'); }
+            if (card.associatedMarker && card.associatedMarker.getElement()){
+              card.associatedMarker.getElement().classList.add('selected'); }
           } else {
             card.classList.remove('highlight');  
           }
@@ -447,8 +445,9 @@
                 card.classList.add('active');
                 card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
-                if (e.target._icon) {
-                  e.target._icon.classList.add('selected');
+                const iconElement = marker.getElement();
+                if (iconElement) {
+                  iconElement.classList.add('selected');
                 }
               });
               bounds.push([lat, lng]);
