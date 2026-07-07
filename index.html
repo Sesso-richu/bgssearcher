@@ -4,7 +4,9 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="Q55XdGfgCRa8f_CpTHVnWHHRnz0POVzW-UhfwbEUPR0" />
   <title>青看板検索ツール</title>
+  <meta name="description" content="日本全国の青看板を地名や道路種別（国道・県道）、形状、地図から検索できるツールです。">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -26,7 +28,31 @@
     .search-container { margin-bottom: 15px; text-align: center; }
     input[type="text"] { width: 100%; max-width: 500px; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
     input[type="text"]:focus { border-color: #3498db; outline: none; }
-   
+
+    .filter-select-wrapper {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select-wrapper select {
+      padding: 10px;
+      font-size: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      max-width: 245px;
+      width: calc(50% - 5px);
+      box-sizing: border-box;
+      color: #333;
+    }
+    .filter-select-wrapper select:focus {
+      border-color:#3498db;
+      outline: none;
+    }
+
     .content-wrapper {
       display: flex;
       flex-direction: row;
@@ -204,7 +230,23 @@
   <div class="main-content">
 
   <div class="search-container">
-    <input type="text" id="searchInput" placeholder="地名を入力…">
+    <input type="text" id="searchInput" placeholder="地名を入力…(ｶﾝﾏ,ｽﾍﾟｰｽ区切り可)" oninput="filterData()">
+    <div class="filter-select-wrapper">
+      <select id="roadTypeFilter" onchange="filterData()">
+        <option value="">すべての道路種別</option>
+        <option value="国道">国道</option>
+        <option value="県道">県道</option>
+        <option value="市道">市道</option>
+        <option value="その他">その他</option>
+      </select>
+      
+      <select id="shapeFilter" onchange="filterData()">
+        <option value="">すべて</option>
+        <option value="分割">分割</option>
+        <option value="シンボル">シンボル</option>
+        <option value="電光">電光</option>
+      </select>
+    </div>
   </div>
 
   <div class="content-wrapper">
@@ -316,23 +358,43 @@
      }, 300);
     });
 
-    function filterData(keyword) {
-      if (!keyword.trim()) {
+    function filterData() {
+      const keyword = (document.getElementById('searchInput')?.value || '');
+      const selectedRoadType = document.getElementById('roadTypeFilter')?.value || '';
+      const selectedShape = document.getElementById('shapeFilter')?.value || '';
+      if (!keyword.trim() && !selectedRoadType && !selectedShape) {
         renderData(allData);
         return;
       }
 
-      const searchWords = keyword.toLowerCase().split(/[\s,、]+/);
+      // キーワードの分割処理
+      const searchWords = keyword.trim() ? keyword.toLowerCase().split(/[\s,、]+/) : [];
 
+      // 全データから、3つの条件すべてをクリアした行だけを絞り込む
       const filtered = allData.filter(function(row) {
         if (!row) return false;
+
+        // キーワード（道路名＋地名）のチェック
         const name = (row['道路名'] || '').toString();
         const desc = (row['地名'] || '').toString();
         const targetText = (name + " " + desc).toLowerCase();
-       
-        return searchWords.every(function(word) { return targetText.indexOf(word) !== -1; });
+        const matchKeyword = searchWords.every(function(word) { 
+          return targetText.indexOf(word) !== -1; 
+        });
+
+        // 道路種別のチェック
+        const roadType = (row['道路種別'] || '').toString();
+        const matchRoadType = !selectedRoadType || roadType === selectedRoadType;
+
+        // 形状のチェック
+        const shape = (row['形状'] || '').toString();
+        const matchShape = !selectedShape || shape === selectedShape;
+
+        // A、B、C すべての条件が true のデータだけを残す
+        return matchKeyword && matchRoadType && matchShape;
       });
 
+      // 絞り込んだ結果を画面（地図とリスト）に描画する
       renderData(filtered);
     }
 
