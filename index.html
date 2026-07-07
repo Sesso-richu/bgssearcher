@@ -27,7 +27,7 @@
     h2 { color: #2c3e50; margin: 0 0 15px 0; font-size: 18px; text-align: center; }
     .search-container {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       gap: 10px;
       margin-bottom: 15px;
@@ -75,14 +75,11 @@
       width: 100%;
       height: 600px;
       max-height: 600px;
-      margin-bottom: 40px;
+      margin-bottom: 15px;
     }
    
-    /* 左側表 */
     .list-container {
       width: 50%;
-      min-width: 50%;
-      max-width: 50%;
       height: 600px;
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
@@ -93,7 +90,6 @@
       box-sizing: border-box;
     }
    
-    /* 表 */
     .data-card {
       display: flex;
       background: white;
@@ -118,13 +114,11 @@
     .card-name { font-size: 14px; font-weight: bold; color: #2c3e50; margin: 0; }
     .card-address { font-size: 12px; color: #7f8c8d; margin: 0; }
    
-    /* 詳細用デザイン */
     .card-detail { font-size: 12px; color: #34495e; margin: 4px 0 0 0; padding-top: 4px; border-top: 1px dashed #ddd; display: none; }
     .data-card.active .card-detail { display: block; } /* クリックされたら表示する */
     .search-container { text-align: left; }
     .card-detail { max-height: 120px; overflow-y: auto; padding-right: 5px; }
    
-    /* 右側地図 */
     #map {
       flex: 1;
       height: 600px;
@@ -139,7 +133,6 @@
 
     .data-card.highlight { background: #fff6e4; border: 1px solid #ffe1b3; }
 
-    /* スマホ画面（幅768px以下）のレイアウト変更 */
     @media screen and (max-width: 768px) {
       .content-wrapper {
         flex-direction: column;
@@ -156,8 +149,6 @@
       .list-container {
         order: 1;
         width: 100%;
-        min-width: 100%;
-        max-width: 100%;
         height: 50vh !important;
         max-height: none !important;
         flex: none;
