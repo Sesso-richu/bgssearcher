@@ -68,17 +68,6 @@
       outline: none;
     }
 
-    .filter-item {
-      display: flex;
-      flex-direction: column; /* 見出しとボックスを上下に並べる */
-      gap: 4px; /* 見出しとボックスの隙間 */
-    }
-    .filter-label {
-      font-size: 12px;
-      color: #7f8c8d; /* 控えめなグレー */
-      font-weight: bold;
-    }
-
     .content-wrapper {
       display: flex;
       flex-direction: row;
@@ -177,9 +166,6 @@
         width: 100%;
       }
       .filter-select-wrapper select {
-        width: 50%;
-      }
-      .filter-item {
         flex: 1;
         width: 50%;
       }
@@ -268,26 +254,20 @@
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="地名を入力…(ｶﾝﾏ,ｽﾍﾟｰｽ区切り可)" oninput="filterData()">
     <div class="filter-select-wrapper">
-      <div class="filter-item">
-        <label class="filter-label">道路種別</label>
-        <select id="roadTypeFilter" onchange="filterData()">
-          <option value="">全て</option>
-          <option value="国道">国道</option>
-          <option value="県道">県道</option>
-          <option value="市道">市道</option>
-          <option value="その他">その他</option>
-        </select>
-      </div>
+      <select id="roadTypeFilter" onchange="filterData()">
+        <option value="">全ての道路種別</option>
+        <option value="国道">国道</option>
+        <option value="県道">県道</option>
+        <option value="市道">市道</option>
+        <option value="その他">その他</option>
+      </select>
      
-      <div class="filter-item">
-        <label class="filter-label">形状</label>
-        <select id="shapeFilter" onchange="filterData()">
-          <option value="">全て</option>
-          <option value="分割">分割</option>
-          <option value="シンボル">シンボル</option>
-          <option value="電光">電光</option>
-        </select>
-      </div>
+      <select id="shapeFilter" onchange="filterData()">
+        <option value="">全ての形状</option>
+        <option value="分割">分割</option>
+        <option value="シンボル">シンボル</option>
+        <option value="電光">電光</option>
+      </select>
     </div>
   </div>
 
