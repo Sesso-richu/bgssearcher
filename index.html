@@ -466,8 +466,7 @@
 
         const detailDiv = document.createElement('div');
         detailDiv.className = 'card-detail';
-        detailDiv.innerHTML = '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' +
-                              '<b>撮影日:</b> ' + displayDate;
+        detailDiv.innerHTML = '<b>座標:</b> ' + (row['座標'] || '-') + '<br>' + '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' + '<b>撮影日:</b> ' + displayDate;
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
