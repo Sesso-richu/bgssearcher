@@ -205,18 +205,21 @@
           <div class="step-title">検索可能な文字列</div>
           <p class="about-text">検索ボックスには地名、高速道路ナンバリング、高速道路名を入力して検索することができます。
             <br>地名及び高速道路名の表記揺れ（「ケ」と「ヶ」、「首都高」と「首都高速」など）は、どちらを入力してもヒットします。</p>
-          </div>
+          <img src="スクリーンショット 2026-07-09 22.39.51.png" class="step-image">
+        </div>
 
         <div class="step-box">
           <div class="step-title">絞り込み機能</div>
           <p class="about-text">道路種別と形状から絞り込みできます。将来的により詳細な絞り込みが可能になるようにする予定です。</p>
-          </div>
+          <img src="スクリーンショット 2026-07-09 22.53.58.png" class="step-image">
+        </div>
       </section>
 
       <section class="about-section">
         <h2 class="section-title">作成者について</h2>
+        <h3>セッソー</h3>
         <p class="about-text">
-          当サイトの運営およびデータの収集を行っている「セッソー」です。
+          武蔵国出身 趣味は青看板と電柱のプレートの画像収集 好きな食べ物は手羽先
         </p>
         <p class="about-text">
           受験期のため現在Twitterはログアウトしています。27年3月頃復帰予定
