@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>about - 青看板検索ツール</title>
+  <style>
+    /* updates.html から完全に継承した基本スタイル */
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ヘッダーの背景画像や重なり（オーバーレイ）を完全継承 */
+    .custom-header {
+      background-image: url('https://i.ibb.co/XrBVGB3y/IMG-2927.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .custom-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+    .header-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      letter-spacing: 2px;
+    }
+    .header-desc {
+      font-size: 16px;
+      font-weight: 300;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    /* ナビゲーションバーを完全継承 */
+    .nav-bar {
+      background: #2c3e50;
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .nav-bar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 15px;
+      transition: opacity 0.2s;
+    }
+    .nav-bar a:hover {
+      opacity: 0.7;
+    }
+    
+    /* 今いるページ（このサイトについて）を少し分かりやすくする設定 */
+    .nav-bar a.active {
+      color: #3498db; /* 更新情報のテーマ色に合わせました。不要なら消してもOKです */
+      font-weight: bold;
+    }
+
+    /* フッターを完全継承 */
+    .custom-footer {
+      background: #2c3e50;
+      color: #bdc3c7;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      margin-top: auto;
+    }
+
+    /* メインコンテンツのレイアウトを継承 */
+    .main-content {
+      padding: 40px 20px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }    
+    .about-container {
+      background: #ffffff;
+      max-width: 800px;
+      width: 100%;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    /* --- ここからAboutページ用の新規デザイン --- */
+    .about-section {
+      margin-bottom: 40px;
+    }
+    .about-section:last-child {
+      margin-bottom: 0;
+    }
+    .section-title {
+      font-size: 24px;
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .about-text {
+      font-size: 15px;
+      color: #34495e;
+      line-height: 1.8;
+      margin: 0 0 15px 0;
+    }
+    
+    /* 図解・使い方のステップ用ボックス */
+    .step-box {
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+    }
+    .step-title {
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    /* 図解画像を載せる時のスタイル */
+    .step-image {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 15px 0 0 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    /* SNSリンクボタン */
+    .sns-link-box {
+      margin-top: 20px;
+    }
+    .sns-button {
+      display: inline-block;
+      background-color: #1fa1f1; /* X（旧Twitter）風のブルー */
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 15px;
+      transition: opacity 0.2s;
+    }
+    .sns-button:hover {
+      opacity: 0.8;
+    }
+    
+    /* スマホ対応を継承・調整 */
+    @media screen and (max-width: 768px) {   
+      .main-content {
+        padding: 20px 15px;
+      }
+      .section-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+      .about-text {
+        font-size: 14px;
+      }
+      .nav-bar a {
+        margin: 0 10px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="custom-header">
+    <div class="header-content">
+      <h1 class="header-title">青看板検索ツール</h1>
+      <p class="header-desc">道路案内標識（青看板）の地名を入力するとその地名の一部を含む青看板がヒットします</p>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a href="./">マップ検索</a>
+    <a href="updates.html">更新情報</a>
+    <a href="about.html" class="active">このサイトについて</a>
+  </nav>
+
+  <div class="main-content">
+    <div class="about-container">
+      
+      <section class="about-section">
+        <h2 class="section-title">青看板検索ツールとは？</h2>
+        <p class="about-text">
+          このサイトは、道路上にあるすべての案内標識（通称：青看板）を網羅することを目指した個人プロジェクトです。
+        </p>
+        <p class="about-text">
+          有名な交差点の大きな看板だけでなく、何気ない一本道にある看板まで1つ1つ丁寧に記録しています。「あの地名はどこから案内され始めるのか」「この道路にはどんな青看板があるのか」といった、道路マニアの方から日常のドライブの確認まで、幅広くご活用いただけます。
+        </p>
+      </section>
+
+      <section class="about-section">
+        <h2 class="section-title">ツールの使い方</h2>
+        
+        <div class="step-box">
+          <div class="step-title">ステップ 1：地名や道路で絞り込む</div>
+          <p class="about-text">検索ボックスに気になる地名を入力するか、ドロップダウンメニューから「道路種別」や「看板の形状」を選択して絞り込みます。</p>
+          ）を外して画像名を指定してください -->
+          </div>
+
+        <div class="step-box">
+          <div class="step-title">ステップ 2：地図とリストで確認する</div>
+          <p class="about-text">条件にマッチした青看板が地図上にピンで表示されます。また、地図の下には該当する青看板のリストが表示され、実際の写真とともに設置場所を確認できます。</p>
+          </div>
+      </section>
+
+      <section class="about-section">
+        <h2 class="section-title">作成者について</h2>
+        <p class="about-text">
+          当サイトの運営およびデータの収集を行っている「セッソー」です。
+        </p>
+        <p class="about-text">
+          現在は一部地域を重点的に調査・記録していますが、将来的には全国の青看板を網羅することを目指して、日々コツコツと活動を続けています。
+        </p>
+        <p class="about-text">
+          最新の調査状況やサイトの更新、青看板に関するミニ情報などはSNS（X）でも発信しています。お気軽にフォローや感想をいただけると励みになります！
+        </p>
+        
+        <div class="sns-link-box">
+          <a href="https://x.com/あなたのユーザー名" target="_blank" class="sns-button">作成者のX（旧Twitter）を見る</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="custom-footer">
+    <small>created by セッソー</small>
+  </footer>
+
+</body>
+</html>
