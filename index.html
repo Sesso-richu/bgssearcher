@@ -459,10 +459,9 @@
       const filtered = allData.filter(function(row) {
         if (!row) return false;
 
-        // キーワード（道路名＋地名）のチェック
-        const name = (row['道路名'] || '').toString();
+        // 地名のチェック
         const desc = (row['地名'] || '').toString();
-        const targetText = (name + " " + desc).toLowerCase();
+        const targetText = (desc).toLowerCase();
         const matchKeyword = searchWords.every(function(word) { 
           return targetText.indexOf(word) !== -1; 
         });
