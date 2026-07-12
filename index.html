@@ -684,7 +684,7 @@
       closeAdvancedSearch();
       filterData(); // 適用ボタンを押したらフィルタリングを実行
     }
-    document.addEventListener('click', function(e) {
+    document.querySelector('.modal-content').addEventListener('click', function(e) {
       const card = e.target.closest('.feature-card');
       if (card) {
         const cb = card.querySelector('input[name="advFeature"]');
