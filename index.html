@@ -684,8 +684,8 @@
       closeAdvancedSearch();
       filterData(); // 適用ボタンを押したらフィルタリングを実行
     }
-    document.querySelector('.modal-content').addEventListener('change', function(e) {
-      if (e.target.name === 'advFeature') {
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.name === 'advFeature') {
         syncCheckboxStyles();
       }
     });
