@@ -117,121 +117,87 @@
 
     .data-card.highlight { background: #fff6e4; border: 1px solid #ffe1b3; }
 
+    #advancedSearchBtn {
+      background: #ecf0f1; border: 2px solid #bdc3c7; color: #2c3e50;
+      border-radius: 8px; padding: 6px 15px; cursor: pointer; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    #advancedSearchBtn:hover { background: #dfe6e9; }
+
+    .modal-overlay {
+      display: none; position: fixed; z-index: 9999; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+      background: #fff; width: 90%; max-width: 600px;
+      height: 90vh;
+      border-radius: 12px; display: flex; flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden;
+    }
+    .modal-header {
+      padding: 15px 20px; border-bottom: 1px solid #ddd;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #eef2f5; flex-shrink: 0;
+    }
+    .modal-close { font-size: 28px; cursor: pointer; color: #7f8c8d; line-height: 1; }
+    
+    /* 中身だけがスクロールする設定 */
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #34495e; }
+    .form-row-2col { display: flex; gap: 15px; }
+    .form-row-2col .form-group { flex: 1; }
+    .modal-body input[type="text"], .modal-body select {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;
+    }
+
+    /* チェックボックス */
+    .feature-section-title { font-size: 13px; color: #7f8c8d; margin: 10px 0 5px 0; }
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .feature-card { cursor: pointer; display: block; }
+    .feature-card input[type="checkbox"] { display: none; /* 元のチェックボックスは隠す */ }
+    .card-content {
+      border: 2px solid #ddd; border-radius: 8px; padding: 10px 5px; text-align: center;
+      transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; box-sizing: border-box; background: #fafafa;
+    }
+    .card-content img { width: 100%; max-height: 50px; object-fit: contain; margin-bottom: 5px; }
+    .card-content span { font-size: 12px; font-weight: bold; color: #2c3e50; }
+    /* チェックされた時の見た目 */
+    .feature-card input[type="checkbox"]:checked + .card-content {
+      border-color: #3498db; background: #ebf5fb; color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+
+    .modal-footer {
+      padding: 15px 20px; border-top: 1px solid #ddd; background: #fff; flex-shrink: 0; text-align: right;
+    }
+    .apply-btn {
+      background: #3498db; color: white; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold;
+      border-radius: 8px; cursor: pointer; width: 100%;
+    }
+
     @media screen and (max-width: 768px) {
-      body {
-        height: 100dvh;
-        min-height: 0;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-      }
-      body .custom-header {
-        display: block;
-        height: auto;
-        min-height: 0;
-        padding: 8px 10px 4px 10px;
-        margin: 0;
-        text-align: left;
-        position: relative;
-      }
-      body .custom-header .header-title {
-        font-size: 15px;
-        margin: 0;
-        padding: 0;
-        line-height: 1.2;
-      }
-      body .custom-header .header-desc {
-        font-size: 10px;
-        margin: 2px 0 0 0;
-        padding: 0;
-        line-height: 1.3;
-        opacity: 0.85;
-        max-width: 55%;
-        white-space: normal; 
-      }
-      body .nav-bar {
-        position: absolute;
-        top: 6px;
-        right: 8px;
-        background: transparent;
-        padding: 0;
-        display: flex;
-        justify-content: flex-start;
-        gap: 5px;
-      }
-      body .nav-bar a {
-        margin: 0;
-        font-size: 11px;
-        background: rgba(44, 62, 80, 0.85);
-        padding: 4px 8px;
-        border-radius: 4px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      }
-      body .main-content {
-        padding: 0; 
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-height: 0;
-      }
-      body .search-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 4px;
-        margin: 6px 6px 4px 6px;
-        padding: 0;
-      }
-      body .search-container input[type="text"] {
-        max-width: 100%;
-        padding: 6px 8px;
-        font-size: 13px;
-        height: auto;
-      }
-      body .filter-select-wrapper {
-        width: 100%;
-        gap: 4px;
-      }
-      body .filter-select-wrapper select {
-        flex: 1;
-        width: 50%;
-        padding: 6px 4px;
-        font-size: 12px;
-        height: auto;
-      }
-      body .content-wrapper {
-        display: flex;
-        flex-direction: column-reverse; 
-        flex: 1; 
-        min-height: 0;
-        gap: 4px;
-        margin: 0 6px 6px 6px;
-        width: auto;
-        height: auto;
-        max-height: none;
-      }    
-      body #map {
-        width: 100%;
-        height: 35dvh;
-        flex: none;
-        margin: 0;
-      }    
-      body .list-container {
-        width: 100%;
-        min-width: 100%;
-        max-width: 100%;
-        height: auto;
-        max-height: none;
-        flex: 1;
-        min-height: 0; 
-        padding: 0;
-        overflow-y: auto;
-      }
-      body .custom-footer {
-        display: none;
-      }
+      body { height: 100dvh; min-height: 0; overflow: hidden margin: 0; padding: 0 display: flex; flex-direction: column; }
+      body .custom-header { display: block; height: auto; min-height: 0; padding: 8px 10px 4px 10px; margin: 0; text-align: left; position: relative; }
+      body .custom-header .header-title { font-size: 15px; margin: 0; padding: 0; line-height: 1.2; }
+      body .custom-header .header-desc { font-size: 10px; margin: 2px 0 0 0; padding: 0; line-height: 1.3; opacity: 0.85; max-width: 55%; white-space: normal; }
+      body .nav-bar { position: absolute; top: 6px; right: 8px; background: transparent; padding: 0; display: flex; justify-content: flex-start; gap: 5px; }
+      body .nav-bar a { margin: 0; font-size: 11px; background: rgba(44, 62, 80, 0.85); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.3); }
+      body .main-content { padding: 0;  margin: 0; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+      body .search-container { flex-direction: column; align-items: stretch; gap: 4px; margin: 6px 6px 4px 6px; padding: 0; }
+      body .search-container input[type="text"] { max-width: 100%; padding: 6px 8px; font-size: 13px; height: auto; }
+      body .filter-select-wrapper { width: 100% gap: 4px; }
+      body .filter-select-wrapper select { flex: 1; width: 50%; padding: 6px 4px; font-size: 12px; height: auto; }
+      body .content-wrapper { display: flex; flex-direction: column-reverse; flex: 1; min-height: 0; gap: 4px; margin: 0 6px 6px 6px; width: auto; height: auto; max-height: none; }    
+      body #map { width: 100%; height: 35dvh; flex: none; margin: 0; }    
+      body .list-container { width: 100%; min-width: 100%; max-width: 100%; height: auto; max-height: none; flex: 1; min-height: 0;  padding: 0; overflow-y: auto; }
+      body .custom-footer { display: none; }
+      body .search-container { flex-direction: column; align-items: stretch; gap: 8px; }
+      #advancedSearchBtn { width: 100%; }
+      .modal-content { width: 95%; height: 85vh; }
+      .checkbox-grid { grid-template-columns: repeat(3, 1fr); }
     }
     .custom-header {
       background-image: url('https://i.ibb.co/zh21tn7g/IMG-2912.jpg');
@@ -317,22 +283,9 @@
 
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="地名を入力…(ｶﾝﾏ,ｽﾍﾟｰｽ区切り可)" oninput="filterData()">
-    <div class="filter-select-wrapper">
-      <select id="roadTypeFilter" onchange="filterData()">
-        <option value="">全ての道路種別</option>
-        <option value="国道">国道</option>
-        <option value="県道">県道</option>
-        <option value="市道">市道</option>
-        <option value="その他">その他</option>
-      </select>
-     
-      <select id="shapeFilter" onchange="filterData()">
-        <option value="">全ての形状</option>
-        <option value="分割">分割</option>
-        <option value="シンボル">シンボル</option>
-        <option value="電光">電光</option>
-      </select>
-    </div>
+    <button id="advancedSearchBtn" onclick="openAdvancedSearch()">
+      <span style="font-size: 15px; font-weight: bold;">詳細検索</span><br><span style="font-size: 11px;">(β版)</span>
+    </button>
   </div>
 
   <div class="content-wrapper">
@@ -348,6 +301,70 @@
 
   <div id="imageViewer" onclick="closeViewer()">
     <img id="viewerImage" src="" alt="拡大画像">
+  </div>
+
+  <div id="advancedSearchModal" class="modal-overlay" onclick="closeAdvancedSearch(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 style="margin:0; font-size:20px; color:#2c3e50;">詳細検索（β版）</h2>
+        <span class="modal-close" onclick="closeAdvancedSearch()">×</span>
+      </div>
+      
+      <div class="modal-body">
+        
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label>都道府県</label>
+            <select id="advPrefecture"><option value="">すべて</option></select>
+          </div>
+          <div class="form-group">
+            <label>道路種別</label>
+            <select id="advRoadType">
+              <option value="">すべて</option>
+              <option value="国道">国道</option>
+              <option value="県道">県道</option>
+              <option value="市道">市道</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>交差路線</label>
+          <input type="text" id="advCrossRoad" placeholder="例: 国道1号">
+        </div>
+        
+        <div class="form-group">
+          <label>高速道路案内</label>
+          <input type="text" id="advHighway" placeholder="ﾅﾝﾊﾞﾘﾝｸﾞか道路名を入力…（例: E1,東名高速）">
+        </div>
+
+        <div class="form-group">
+          <label style="margin-bottom: 5px;">特徴</label>
+          
+          <div class="feature-section-title">《形状》</div>
+          <div class="checkbox-grid">
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="分割"><div class="card-content"><img src="shape1.jpg" alt="画像" onerror="this.style.display='none'"><span>分割</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="シンボル"><div class="card-content"><img src="shape2.jpg" alt="画像" onerror="this.style.display='none'"><span>シンボル</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="電光"><div class="card-content"><img src="shape3.jpg" alt="画像" onerror="this.style.display='none'"><span>電光</span></div></label>
+          </div>
+
+          <div class="feature-section-title">《概形》</div>
+          <div class="checkbox-grid">
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="交差なし"><div class="card-content"><img src="crossimg_1.png" alt="画像" onerror="this.style.display='none'"><span>交差なし</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="2交差"><div class="card-content"><img src="crossimg_2.png" alt="画像" onerror="this.style.display='none'"><span>2交差</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="3交差以上"><div class="card-content"><img src="crossimg_3.png" alt="画像" onerror="this.style.display='none'"><span>3交差以上</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="行止まり"><div class="card-content"><img src="crossimg_stp.png" alt="画像" onerror="this.style.display='none'"><span>行止まり</span></div></label>
+            <label class="feature-card"><input type="checkbox" name="advFeature" value="矢印なし"><div class="card-content"><img src="crossimg_x.png" alt="画像" onerror="this.style.display='none'"><span>矢印なし</span></div></label>
+          </div>
+        </div>
+
+      </div>
+      
+      <div class="modal-footer">
+        <button class="apply-btn" onclick="applyAdvancedSearch()">適用</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -423,6 +440,8 @@
           }
 
           allData = formattedData;
+          const prefs = Array.from(new Set(allData.map(r => r['都道府県']).filter(p => p))).sort();
+          prefs.forEach(p => document.getElementById('advPrefecture').insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
           renderData(allData);
         } catch (err) {
           document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">エラー: ' + err.message + '</div>';
@@ -445,40 +464,45 @@
 
     function filterData() {
       const keyword = (document.getElementById('searchInput')?.value || '');
-      const selectedRoadType = document.getElementById('roadTypeFilter')?.value || '';
-      const selectedShape = document.getElementById('shapeFilter')?.value || '';
-      if (!keyword.trim() && !selectedRoadType && !selectedShape) {
-        renderData(allData);
-        return;
-      }
-
-      // キーワードの分割処理
       const searchWords = keyword.trim() ? keyword.toLowerCase().split(/[\s,、]+/) : [];
 
-      // 全データから、3つの条件すべてをクリアした行だけを絞り込む
+      // 詳細検索の各値を取得
+      const prefecture = document.getElementById('advPrefecture')?.value || '';
+      const roadType = document.getElementById('advRoadType')?.value || '';
+      const crossRoad = (document.getElementById('advCrossRoad')?.value || '').toLowerCase();
+      const highway = (document.getElementById('advHighway')?.value || '').toLowerCase();
+      
+      // チェックされた特徴（複数）を取得
+      const featureCheckboxes = document.querySelectorAll('input[name="advFeature"]:checked');
+      const selectedFeatures = Array.from(featureCheckboxes).map(cb => cb.value);
+
       const filtered = allData.filter(function(row) {
         if (!row) return false;
 
-        // 地名のチェック
-        const desc = (row['地名'] || '').toString();
-        const targetText = (desc).toLowerCase();
-        const matchKeyword = searchWords.every(function(word) { 
-          return targetText.indexOf(word) !== -1; 
-        });
+        // 1. 地名のチェック (通常検索バー)
+        const desc = (row['地名'] || '').toString().toLowerCase();
+        const matchKeyword = searchWords.length === 0 || searchWords.every(word => desc.indexOf(word) !== -1);
 
-        // 道路種別のチェック
-        const roadType = (row['道路種別'] || '').toString();
-        const matchRoadType = !selectedRoadType || roadType === selectedRoadType;
+        // 2. 都道府県のチェック
+        const matchPrefecture = !prefecture || (row['都道府県'] || '') === prefecture;
 
-        // 形状のチェック
-        const shape = (row['形状'] || '').toString();
-        const matchShape = !selectedShape || shape === selectedShape;
+        // 3. 道路種別のチェック
+        const matchRoadType = !roadType || (row['道路種別'] || '') === roadType;
 
-        // A、B、C すべての条件が true のデータだけを残す
-        return matchKeyword && matchRoadType && matchShape;
+        // 4. 交差路線のチェック（部分一致）
+        const matchCrossRoad = !crossRoad || (row['交差路線'] || '').toString().toLowerCase().indexOf(crossRoad) !== -1;
+
+        // 5. 高速道路案内のチェック（部分一致）
+        const matchHighway = !highway || (row['高速'] || '').toString().toLowerCase().indexOf(highway) !== -1;
+
+        // 6. 特徴のチェック（AND検索：選んだ項目が「特徴」列の文字列の中に全て含まれているか）
+        const rowFeature = (row['特徴'] || '').toString();
+        const matchFeature = selectedFeatures.length === 0 || selectedFeatures.every(feat => rowFeature.indexOf(feat) !== -1);
+
+        // すべての条件をクリアしたデータだけを残す
+        return matchKeyword && matchPrefecture && matchRoadType && matchCrossRoad && matchHighway && matchFeature;
       });
 
-      // 絞り込んだ結果を画面（地図とリスト）に描画する
       renderData(filtered);
     }
 
@@ -625,6 +649,19 @@
 
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
+    }
+    // モーダルの制御
+    function openAdvancedSearch() {
+      document.getElementById('advancedSearchModal').classList.add('show');
+    }
+    function closeAdvancedSearch(e) {
+      // 背景クリックで閉じる処理
+      if (e && e.target !== document.getElementById('advancedSearchModal') && !e.target.classList.contains('modal-close')) return;
+      document.getElementById('advancedSearchModal').classList.remove('show');
+    }
+    function applyAdvancedSearch() {
+      closeAdvancedSearch();
+      filterData(); // 適用ボタンを押したらフィルタリングを実行
     }
   </script>
 </body>
