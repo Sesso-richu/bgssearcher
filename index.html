@@ -340,6 +340,13 @@
               <option value="その他">その他</option>
             </select>
           </div>
+          <div class="form-group" style="flex: 1;">
+            <label>道路名</label>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <input type="text" id="advRoadNameInput" placeholder="例: 1" style="flex: 1;">
+              <span style="font-weight: bold; white-space: nowrap; margin-top: 2px;">（号）</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -481,6 +488,7 @@
       // 詳細検索の各値を取得
       const prefecture = document.getElementById('advPrefecture')?.value || '';
       const roadType = document.getElementById('advRoadType')?.value || '';
+      const roadNameInput = (document.getElementById('advRoadNameInput')?.value || '').toLowerCase();
       const crossRoad = (document.getElementById('advCrossRoad')?.value || '').toLowerCase();
       const highway = (document.getElementById('advHighway')?.value || '').toLowerCase();
       
@@ -494,11 +502,12 @@
         const matchKeyword = searchWords.length === 0 || searchWords.every(word => desc.indexOf(word) !== -1);
         const matchPrefecture = !prefecture || (row['都道府県'] || '') === prefecture;
         const matchRoadType = !roadType || (row['道路種別'] || '') === roadType;
+        const matchRoadNameInput = !roadNameInput || (row['道路名'] || '').toString().toLowerCase().indexOf(roadNameInput) !== -1;
         const matchCrossRoad = !crossRoad || (row['交差路線'] || '').toString().toLowerCase().indexOf(crossRoad) !== -1;
         const matchHighway = !highway || (row['高速'] || '').toString().toLowerCase().indexOf(highway) !== -1;
         const rowFeature = (row['特徴'] || '').toString();
         const matchFeature = selectedFeatures.length === 0 || selectedFeatures.every(feat => rowFeature.indexOf(feat) !== -1);
-        return matchKeyword && matchPrefecture && matchRoadType && matchCrossRoad && matchHighway && matchFeature;
+        return matchKeyword && matchPrefecture && matchRoadType && matchRoadNameInput && matchCrossRoad && matchHighway && matchFeature;
       });
       renderData(filtered);
     }
@@ -671,6 +680,7 @@
     function clearAdvancedSearch() {
       if (document.getElementById('advPrefecture')) document.getElementById('advPrefecture').value = '';
       if (document.getElementById('advRoadType')) document.getElementById('advRoadType').value = '';
+      if (document.getElementById('advRoadNameInput')) document.getElementById('advRoadNameInput').value = '';
       if (document.getElementById('advCrossRoad')) document.getElementById('advCrossRoad').value = '';
       if (document.getElementById('advHighway')) document.getElementById('advHighway').value = '';
       const checkboxes = document.querySelectorAll('input[name="advFeature"]');
