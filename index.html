@@ -161,7 +161,7 @@
     .feature-card input[type="checkbox"] { display: none; /* 元のチェックボックスは隠す */ }
     .card-content {
       border: 2px solid #ddd; border-radius: 8px; padding: 10px 5px; text-align: center;
-      transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; box-sizing: border-box; background: #fafafa;
+      transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; box-sizing: border-box; background: #ffffff;
     }
     .card-content img { width: 100%; max-height: 50px; object-fit: contain; margin-bottom: 5px; }
     .card-content span { font-size: 12px; font-weight: bold; color: #2c3e50; }
@@ -173,10 +173,16 @@
     .modal-footer {
       padding: 15px 20px; border-top: 1px solid #ddd; background: #fff; flex-shrink: 0; text-align: right;
     }
+    .clear-btn {
+      background: #bdc3c7; color: #2c3e50; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold;
+      border-radius: 8px; cursor: pointer; flex: 1; transition: background 0.2s;
+    }
+    .clear-btn:hover { background: #b2bec3; }
     .apply-btn {
       background: #3498db; color: white; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold;
-      border-radius: 8px; cursor: pointer; width: 100%;
+      border-radius: 8px; cursor: pointer; flex: 2; transition: background 0.2s;
     }
+    .apply-btn:hover { background: #2980b9; }
 
     @media screen and (max-width: 768px) {
       body { height: 100dvh; min-height: 0; overflow: hidden margin: 0; padding: 0 display: flex; flex-direction: column; }
@@ -315,7 +321,12 @@
         <div class="form-row-2col">
           <div class="form-group">
             <label>都道府県</label>
-            <select id="advPrefecture"><option value="">すべて</option></select>
+            <select id="advPrefecture">
+              <option value="">すべて</option>
+              <option value="埼玉県">埼玉県</option><option value="千葉県">千葉県</option><option value="東京都">東京都</option><option value="神奈川県">神奈川県</option>
+              <option value="石川県">石川県</option><option value="岐阜県">岐阜県</option><option value="静岡県">静岡県</option>
+              <option value="京都府">京都府</option>
+            </select>
           </div>
           <div class="form-group">
             <label>道路種別</label>
@@ -336,7 +347,7 @@
         
         <div class="form-group">
           <label>高速道路案内</label>
-          <input type="text" id="advHighway" placeholder="ﾅﾝﾊﾞﾘﾝｸﾞか道路名を入力…（例: E1,東名高速）">
+          <input type="text" id="advHighway" placeholder="ﾅﾝﾊﾞﾘﾝｸﾞか道路名を入力（例: E1,東名高速）">
         </div>
 
         <div class="form-group">
@@ -363,6 +374,7 @@
       
       <div class="modal-footer">
         <button class="apply-btn" onclick="applyAdvancedSearch()">適用</button>
+        <button class="clear-btn" onclick="clearAdvancedSearch()">条件をクリア</button>
       </div>
     </div>
   </div>
@@ -440,8 +452,6 @@
           }
 
           allData = formattedData;
-          const prefs = Array.from(new Set(allData.map(r => r['都道府県']).filter(p => p))).sort();
-          prefs.forEach(p => document.getElementById('advPrefecture').insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
           renderData(allData);
         } catch (err) {
           document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">エラー: ' + err.message + '</div>';
@@ -478,31 +488,16 @@
 
       const filtered = allData.filter(function(row) {
         if (!row) return false;
-
-        // 1. 地名のチェック (通常検索バー)
         const desc = (row['地名'] || '').toString().toLowerCase();
         const matchKeyword = searchWords.length === 0 || searchWords.every(word => desc.indexOf(word) !== -1);
-
-        // 2. 都道府県のチェック
         const matchPrefecture = !prefecture || (row['都道府県'] || '') === prefecture;
-
-        // 3. 道路種別のチェック
         const matchRoadType = !roadType || (row['道路種別'] || '') === roadType;
-
-        // 4. 交差路線のチェック（部分一致）
         const matchCrossRoad = !crossRoad || (row['交差路線'] || '').toString().toLowerCase().indexOf(crossRoad) !== -1;
-
-        // 5. 高速道路案内のチェック（部分一致）
         const matchHighway = !highway || (row['高速'] || '').toString().toLowerCase().indexOf(highway) !== -1;
-
-        // 6. 特徴のチェック（AND検索：選んだ項目が「特徴」列の文字列の中に全て含まれているか）
         const rowFeature = (row['特徴'] || '').toString();
         const matchFeature = selectedFeatures.length === 0 || selectedFeatures.every(feat => rowFeature.indexOf(feat) !== -1);
-
-        // すべての条件をクリアしたデータだけを残す
         return matchKeyword && matchPrefecture && matchRoadType && matchCrossRoad && matchHighway && matchFeature;
       });
-
       renderData(filtered);
     }
 
@@ -658,6 +653,17 @@
       // 背景クリックで閉じる処理
       if (e && e.target !== document.getElementById('advancedSearchModal') && !e.target.classList.contains('modal-close')) return;
       document.getElementById('advancedSearchModal').classList.remove('show');
+    }
+    function clearAdvancedSearch() {
+      if (document.getElementById('advPrefecture')) document.getElementById('advPrefecture').value = '';
+      if (document.getElementById('advRoadType')) document.getElementById('advRoadType').value = '';
+      if (document.getElementById('advCrossRoad')) document.getElementById('advCrossRoad').value = '';
+      if (document.getElementById('advHighway')) document.getElementById('advHighway').value = '';
+      const checkboxes = document.querySelectorAll('input[name="advFeature"]');
+      checkboxes.forEach(function(cb) {
+        cb.checked = false;
+      });
+      filterData();
     }
     function applyAdvancedSearch() {
       closeAdvancedSearch();
