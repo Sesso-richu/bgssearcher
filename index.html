@@ -157,8 +157,8 @@
     /* チェックボックス */
     .feature-section-title { font-size: 13px; color: #7f8c8d; margin: 10px 0 5px 0; }
     .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 10px; }
-    .feature-card { cursor: pointer; display: block; }
-    .feature-card input[type="checkbox"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 10;}
+    .feature-card { cursor: pointer; display: block; position: relative; }
+    .feature-card input[type="checkbox"] { position: absolute; top: 0; left: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 10; margin: 0; }
     .card-content {
       border: 2px solid #ddd; border-radius: 8px; padding: 10px 5px; text-align: center;
       transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; box-sizing: border-box; background: #ffffff;
