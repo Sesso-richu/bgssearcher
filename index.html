@@ -148,7 +148,7 @@
     
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #34495e; }
-    .form-row-2col { display: flex; gap: 15px; }
+    .form-row-2col { display: flex; gap: 15px; background: #ffffff; }
     .form-row-2col .form-group { flex: 1; }
     .modal-body input[type="text"], .modal-body select {
       width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;
@@ -169,7 +169,9 @@
     .feature-card input[type="checkbox"]:checked + .card-content {
       border-color: #3498db; background: #ebf5fb; color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
     }
-
+    .card-content.is-active {
+      border-color: #3498db; background: #ebf5fb; color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
     .modal-footer {
       padding: 15px 20px; border-top: 1px solid #ddd; background: #fff; flex-shrink: 0; text-align: right;
     }
@@ -633,7 +635,6 @@
         map.fitBounds(bounds, { padding: [30, 30] });
       }
     }
-
     function openViewer(src) {
       if (src.indexOf('placehold.co') !== -1) return;
       const viewer = document.getElementById('imageViewer');
@@ -641,13 +642,26 @@
       img.src = src;
       viewer.classList.add('show');
     }
-
     function closeViewer() {
       document.getElementById('imageViewer').classList.remove('show');
+    }
+    function syncCheckboxStyles() {
+      const checkboxes = document.querySelectorAll('input[name="advFeature"]');
+      checkboxes.forEach(function(cb) {
+        const cardContent = cb.nextElementSibling;
+        if (cardContent) {
+          if (cb.checked) {
+            cardContent.classList.add('is-active');
+          } else {
+            cardContent.classList.remove('is-active');
+          }
+        }
+      });
     }
     // モーダルの制御
     function openAdvancedSearch() {
       document.getElementById('advancedSearchModal').classList.add('show');
+      syncCheckboxStyles();
     }
     function closeAdvancedSearch(e) {
       // 背景クリックで閉じる処理
@@ -663,6 +677,7 @@
       checkboxes.forEach(function(cb) {
         cb.checked = false;
       });
+      syncCheckboxStyles();
       filterData();
     }
     function applyAdvancedSearch() {
