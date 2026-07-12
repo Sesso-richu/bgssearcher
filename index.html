@@ -684,15 +684,9 @@
       closeAdvancedSearch();
       filterData(); // 適用ボタンを押したらフィルタリングを実行
     }
-    document.getElementById('advancedSearchModal').addEventListener('click', function(e) {
-      const card = e.target.closest('.feature-card');
-      if (card) {
-        const cb = card.querySelector('input[name="advFeature"]');
-        if (cb) {
-          setTimeout(() => {
-            syncCheckboxStyles();
-          }, 50);
-        }
+    document.querySelector('.modal-content').addEventListener('change', function(e) {
+      if (e.target.name === 'advFeature') {
+        syncCheckboxStyles();
       }
     });
   </script>
