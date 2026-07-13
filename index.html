@@ -367,13 +367,18 @@
         </div>
 
         <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="advAddress" placeholder="住所の一部か全部を入力">
+        </div>
+
+        <div class="form-group">
           <label>交差路線</label>
           <input type="text" id="advCrossRoad" placeholder="例: 国道1号">
         </div>
         
         <div class="form-group">
           <label>高速道路案内</label>
-          <input type="text" id="advHighway" placeholder="ﾅﾝﾊﾞﾘﾝｸﾞか道路名を入力（例: E1,東名高速）">
+          <input type="text" id="advHighway" placeholder="ﾅﾝﾊﾞﾘﾝｸﾞや道路名を入力（例: E1,東名高速）">
         </div>
 
         <div class="form-group">
@@ -533,8 +538,12 @@
       const prefecture = document.getElementById('advPrefecture')?.value || '';
       const roadType = document.getElementById('advRoadType')?.value || '';
       const roadNameInput = (document.getElementById('advRoadNameInput')?.value || '').toLowerCase();
-      const crossRoad = (document.getElementById('advCrossRoad')?.value || '').toLowerCase();
-      const highway = (document.getElementById('advHighway')?.value || '').toLowerCase();
+      const addressRaw = document.getElementById('advAddress')?.value || '';
+      const addressWords = addressRaw.trim() ? addressRaw.toLowerCase().split(/[\s,、]+/) : [];
+      const crossRoadRaw = document.getElementById('advCrossRoad')?.value || '';
+      const crossRoadWords = crossRoadRaw.trim() ? crossRoadRaw.toLowerCase().split(/[\s,、]+/) : [];
+      const highwayRaw = document.getElementById('advHighway')?.value || '';
+      const highwayWords = highwayRaw.trim() ? highwayRaw.toLowerCase().split(/[\s,、]+/) : [];
       
       // チェックされた特徴（複数）を取得
       const featureCheckboxes = document.querySelectorAll('input[name="advFeature"]:checked');
@@ -547,11 +556,12 @@
         const matchPrefecture = !prefecture || (row['都道府県'] || '') === prefecture;
         const matchRoadType = !roadType || (row['道路種別'] || '') === roadType;
         const matchRoadNameInput = !roadNameInput || (row['道路名'] || '').toString().toLowerCase().indexOf(roadNameInput) !== -1;
-        const matchCrossRoad = !crossRoad || (row['交差路線'] || '').toString().toLowerCase().indexOf(crossRoad) !== -1;
-        const matchHighway = !highway || (row['高速'] || '').toString().toLowerCase().indexOf(highway) !== -1;
+        const matchAddress = addressWords.length === 0 || addressWords.every(word => (row['住所'] || '').toString().toLowerCase().indexOf(word) !== -1);
+        const matchCrossRoad = crossRoadWords.length === 0 || crossRoadWords.every(word => (row['交差路線'] || '').toString().toLowerCase().indexOf(word) !== -1);
+        const matchHighway = highwayWords.length === 0 || highwayWords.every(word => (row['高速'] || '').toString().toLowerCase().indexOf(word) !== -1);
         const rowFeature = (row['特徴'] || '').toString();
         const matchFeature = selectedFeatures.length === 0 || selectedFeatures.every(feat => rowFeature.indexOf(feat) !== -1);
-        return matchKeyword && matchPrefecture && matchRoadType && matchRoadNameInput && matchCrossRoad && matchHighway && matchFeature;
+        return matchKeyword && matchPrefecture && matchRoadType && matchRoadNameInput && matchAddress && matchCrossRoad && matchHighway && matchFeature;
       });
       renderData(filtered);
     }
@@ -725,6 +735,7 @@
       if (document.getElementById('advPrefecture')) document.getElementById('advPrefecture').value = '';
       if (document.getElementById('advRoadType')) document.getElementById('advRoadType').value = '';
       if (document.getElementById('advRoadNameInput')) document.getElementById('advRoadNameInput').value = '';
+      if (document.getElementById('advAddress')) document.getElementById('advAddress').value = '';
       if (document.getElementById('advCrossRoad')) document.getElementById('advCrossRoad').value = '';
       if (document.getElementById('advHighway')) document.getElementById('advHighway').value = '';
       const checkboxes = document.querySelectorAll('input[name="advFeature"]');
