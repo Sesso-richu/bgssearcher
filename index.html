@@ -203,7 +203,6 @@
       body .content-wrapper { display: flex; flex-direction: column-reverse; flex: 1; min-height: 0; gap: 4px; margin: 0 6px 6px 6px; width: auto; height: auto; max-height: none; }    
       body #map { width: 100%; height: 35dvh; flex: none; margin: 0; }    
       body .list-container { width: 100%; min-width: 100%; max-width: 100%; height: auto; max-height: none; flex: 1; min-height: 0;  padding: 0; overflow-y: auto; }
-      body .custom-footer { display: none; }
       body .search-container { flex-direction: column; align-items: stretch; gap: 8px; }
       #advancedSearchBtn { width: 100%; }
       .modal-content { width: 95%; height: 85vh; }
@@ -256,13 +255,6 @@
     }
     .nav-bar a:hover {
       opacity: 0.7;
-    }
-    .custom-footer {
-      background: #2c3e50;
-      color: #bdc3c7;
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
     }
     .custom-square-marker {
       background-color: #3250a8;
@@ -319,10 +311,6 @@
     </div>
     <div id="map"></div>
   </div>
-
-  <footer class="custom-footer">
-    <small>created by セッソー</small>
-  </footer>
 
   <div id="imageViewer" onclick="closeViewer()">
     <img id="viewerImage" src="" alt="拡大画像">
