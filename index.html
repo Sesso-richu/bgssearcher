@@ -28,11 +28,15 @@
       color: #333;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
     }
     .main-content{
       padding: 15px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     h2 {
       color: #2c3e50;
@@ -83,15 +87,15 @@
       flex-direction: row;
       gap: 15px;
       width: 100%;
-      height: 600px;
-      max-height: 600px;
+      flex: 1;
+      min-height: 0;
     }   
     .list-container {
       width: 50%;
       min-width: 50%;
       max-width: 50%;
-      height: 600px;
-      overflow-y: scroll;
+      height: 100%;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
@@ -109,7 +113,7 @@
     .data-card.active .card-detail { display: block; }    
     .search-container { text-align: left; }
    
-    #map { flex: 1; height: 600px; border-radius: 8px; border: 1px solid #eef2f5; outline: none; }
+    #map { flex: 1; height: 100%; border-radius: 8px; border: 1px solid #eef2f5; outline: none; }
    
     .no-data { text-align: center; padding: 40px; background: white; border-radius: 8px; color: #7f8c8d; font-size: 14px; width: 100%; box-sizing: border-box; }
     #imageViewer { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center; }
