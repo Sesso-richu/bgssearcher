@@ -187,15 +187,24 @@
     .apply-btn:hover { background: #2980b9; }
 
     .custom-header {
-      background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('https://i.ibb.co/zh21tn7g/IMG-2912.jpg');
+      background-image: url('https://i.ibb.co/zh21tn7g/IMG-2912.jpg');
       background-size: cover;
       background-position: center;
       position: relative;
       color: white;
-      padding: 8px 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      padding: 12px 20px;
+    }
+    .custom-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 1;
     }
     .header-container {
+      position: relative;
+      z-index: 2;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -203,30 +212,24 @@
       margin: 0 auto;
       width: 100%;
     }
-    .header-left {
-      display: flex;
-      align-items: center;
-    }
     .header-title {
-      font-size: 1.1rem;
+      font-size: 18px;
       font-weight: bold;
       margin: 0;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
     }
     .header-nav {
       display: flex;
-      align-items: center;
-      gap: 10px; /* メニュー同士の隙間 */
+      gap: 20px;
     }
-    .nav-link {
+    .header-nav a {
       color: white;
-      font-size: 13px;
-      padding: 5px 12px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
+      font-size: 14px;
+      font-weight: 500;
+      transition: opacity 0.2s;
     }
-    .nav-link:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+    .header-nav a:hover {
+      opacity: 0.7;
     } 
     .custom-square-marker {
       background-color: #3250a8;
@@ -256,8 +259,10 @@
     @media screen and (max-width: 768px) {
       body { height: 100dvh; min-height: 0; overflow: hidden; margin: 0; padding: 0; display: flex; flex-direction: column; }
       body .custom-header { padding: 8px 10px; }
+      body .header-container { display: flex; justify-content: space-between; align-items: center; }
       body .header-title { font-size: 15px; }
-      body .nav-link { font-size: 11px; padding: 3px 8px; }
+      body .header-nav { gap: 10px; }
+      body .header-nav a { font-size: 11px; padding: 4px 8px; border-radius: 4px; }
       body .main-content { padding: 0;  margin: 0; display: flex; flex-direction: column; flex: 1; min-height: 0; }
       body .search-container { flex-direction: column; align-items: stretch; gap: 4px; margin: 6px 6px 4px 6px; padding: 0; }
       body .search-container input[type="text"] { max-width: 100%; padding: 6px 8px; font-size: 13px; height: auto; }
@@ -278,13 +283,12 @@
   <header class="custom-header">
     <div class="header-content">
       <h1 class="header-title">青看板検索ツール</h1>
+      <nav class="header-nav">
+        <a href="./">マップ検索</a>
+        <a href="about.html">about</a>
+      </nav>
     </div>
   </header>
-
-  <nav class="nav-bar">
-    <a href="./">マップ検索</a>
-    <a href="about.html">about</a>
-  </nav>
 
   <div class="main-content">
 
