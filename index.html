@@ -425,7 +425,8 @@
       markerGroup = L.markerClusterGroup({
         chunkedLoading: true,
         maxClusterRadius: 80,
-        disableClusteringAtZoom: 10
+        disableClusteringAtZoom: 11,
+        animate: false
       }).addTo(map);
 
       const locateControl = L.control({ position: 'topleft' });
