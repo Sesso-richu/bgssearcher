@@ -424,8 +424,8 @@
       }).addTo(map);
       markerGroup = L.markerClusterGroup({
         chunkedLoading: true,
-        maxClusterRadius: 50,
-        disableClusteringAtZoom: 16
+        maxClusterRadius: 80,
+        disableClusteringAtZoom: 14
       }).addTo(map);
 
       const locateControl = L.control({ position: 'topleft' });
@@ -664,19 +664,30 @@
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
-          document.querySelectorAll('.data-card.active').forEach(c => c.classList.remove('active', 'highlight'));
-          document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
+          document.querySelectorAll('.data-card.active').forEach(c => { 
+            if (c !== card) c.classList.remove('active', 'highlight'); 
+          });
           
-          card.classList.add('active', 'highlight');
-          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));     
+          const isActive = card.classList.toggle('active');
+          
+          if (isActive) {
+            card.classList.add('highlight');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-          if (row['緯度'] && row['経度']) {
-            map.setView([row['緯度'], row['経度']], 16);
-            if (row._marker) {
-              markerGroup.zoomToShowLayer(row._marker, function() {
-                const iconElement = row._marker.getElement();
-                if (iconElement) iconElement.classList.add('selected');
-              });
+            if (row['緯度'] && row['経度']) {
+              map.setView([row['緯度'], row['経度']], 16);
+              if (row._marker) {
+                markerGroup.zoomToShowLayer(row._marker, function() {
+                  const iconElement = row._marker.getElement();
+                  if (iconElement) iconElement.classList.add('selected');
+                });
+              }
+            }
+          } else {
+            card.classList.remove('highlight');
+            if (row._marker && row._marker.getElement()) {
+              row._marker.getElement().classList.remove('selected');
             }
           }
         });
