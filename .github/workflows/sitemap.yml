@@ -21,7 +21,6 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v4
 
-      # GitHub Pagesへ公開準備（アーティファクト作成）
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
@@ -30,7 +29,6 @@ jobs:
         with:
           path: '.'
 
-      # GitHub Pagesへデプロイ
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
