@@ -16,6 +16,9 @@
   <meta name="description" content="日本全国の青看板を地名や道路種別（国道・県道）、形状、地図から検索できるツールです。">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <link rel="canonical" href="https://sesso-richu.github.io/bgssearcher/">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="favicon.png">
@@ -410,12 +413,20 @@
     let map;
     let markerGroup;
 
+    let currentFilteredData = [];
+    let currentDisplayCount = 0;
+    const CHUNK_SIZE = 30;
+
     function initMap() {
       map = L.map('map', { zooming: true, touchZoom: true }).setView([35.6812, 139.7671], 10);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
-      markerGroup = L.layerGroup().addTo(map);
+      markerGroup = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 50,
+        disableClusteringAtZoom: 16
+      }).addTo(map);
 
       const locateControl = L.control({ position: 'topleft' });
 
@@ -445,83 +456,70 @@
       });
     }
 
-    window.google = { 
-      visualization: { 
-        Query: { 
-          setResponse: function(obj) { 
-            window.handleGoogleResponse(obj); 
-          } 
-        } 
-      } 
-    };
-
-    window.onload = function() {
+    window.onload = async function() {
       initMap();
-      window.handleGoogleResponse = function(obj) {
-        try {
-          if (obj.status === 'error') {
-            throw new Error('スプレッドシートのアクセス権限エラー: ' + (obj.errors[0].message || ''));
+      
+      document.getElementById('listContainer').addEventListener('scroll', function() {
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 100) {
+          if (currentDisplayCount < currentFilteredData.length) {
+            renderListChunk();
           }
-          if (!obj || !obj.table) throw new Error('データ空');
-          
-          const table = obj.table;
-          let headers = [];
-          let dataRows = [];
-          
-          // 見出しを取り出す
-          if (table.cols && table.cols.some(c => c.label)) {
-            headers = table.cols.map(c => c.label ? String(c.label).trim() : '');
-            dataRows = table.rows; // データはそのまま使用
-          } else {
-            // 予備ルート
-            headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
-            dataRows = table.rows.slice(1);
-          }
-
-          const formattedData = dataRows.map(row => {
-            if (!row || !row.c) return null;
-            const item = {};
-            row.c.forEach((cell, index) => {
-              const header = headers[index];
-              if (header) {
-                item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
-              }
-            });
-
-            if (item['座標']) {
-              const coords = String(item['座標']).split(/[、,，\s]+/);
-              if (coords.length >= 2) {
-                item['緯度'] = parseFloat(coords[0]);
-                item['経度'] = parseFloat(coords[1]);
-              }
-            }
-            item['名称'] = item['道路名'] || item['地名'] || '無名のスポット';
-            return item;
-          }).filter(item => item !== null && !isNaN(item['緯度']) && !isNaN(item['経度']));
-
-          if (formattedData.length === 0) {
-            document.getElementById('listContainer').innerHTML = '<div class="no-data">データは取得できましたが、表示できるデータが0件です（「座標」という列名が存在しない可能性があります）</div>';
-            return;
-          }
-
-          allData = formattedData;
-          renderData(allData);
-        } catch (err) {
-          document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red; font-weight:bold;">エラー: ' + err.message + '</div>';
         }
-      };
+      });
 
-      const sheetId = '11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes';
-      const script = document.createElement('script');
-      script.src = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&sheet=シート1';
-      document.body.appendChild(script);
+      try {
+        const dataUrl = 'https://docs.google.com/spreadsheets/d/11TIskUDnOrnWfnyXt9-IrFuSRRQHhpLTxjcQ1U6GXes/gviz/tq?tqx=out:json&sheet=シート1';      
+        const response = await fetch(dataUrl);
+        const text = await response.text();      
+        const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        const obj = JSON.parse(jsonStr);
+        const table = obj.table;      
+        let headers = [];
+        let dataRows = [];
+        
+        if (table.cols && table.cols.some(c => c.label)) {
+          headers = table.cols.map(c => c.label ? String(c.label).trim() : '');
+          dataRows = table.rows;
+        } else {
+          headers = table.rows[0].c.map(cell => cell ? (cell.v !== null ? String(cell.v).trim() : '') : '');
+          dataRows = table.rows.slice(1);
+        }
+
+        const formattedData = dataRows.map(row => {
+          if (!row || !row.c) return null;
+          const item = {};
+          row.c.forEach((cell, index) => {
+            const header = headers[index];
+            if (header) {
+              item[header] = cell ? (cell.v !== null ? String(cell.v) : '') : '';
+            }
+          });
+          if (item['座標']) {
+            const coords = String(item['座標']).split(/[、,，\s]+/);
+            if (coords.length >= 2) {
+              item['緯度'] = parseFloat(coords[0]);
+              item['経度'] = parseFloat(coords[1]);
+            }
+          }
+          item['名称'] = item['道路名'] || item['地名'] || '無名のスポット';
+          return item;
+        }).filter(item => item !== null && !isNaN(item['緯度']) && !isNaN(item['経度']));
+
+        if (formattedData.length === 0) throw new Error('表示できるデータが0件です');
+
+        allData = formattedData;
+        filterData();
+
+      } catch (err) {
+        document.getElementById('listContainer').innerHTML = '<div class="no-data" style="color:red;">エラー: ' + err.message + '</div>';
+      }
     };
-  
+
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', function() {
      clearTimeout(searchTimeout);
      searchTimeout = setTimeout(() => {
-       filterData(this.value);
+       filterData();
      }, 300);
     });
 
@@ -529,7 +527,6 @@
       const keyword = (document.getElementById('searchInput')?.value || '');
       const searchWords = keyword.trim() ? keyword.toLowerCase().split(/[\s,、]+/) : [];
 
-      // 詳細検索の各値を取得
       const prefecture = document.getElementById('advPrefecture')?.value || '';
       const roadType = document.getElementById('advRoadType')?.value || '';
       const roadNameInput = (document.getElementById('advRoadNameInput')?.value || '').toLowerCase();
@@ -540,7 +537,6 @@
       const highwayRaw = document.getElementById('advHighway')?.value || '';
       const highwayWords = highwayRaw.trim() ? highwayRaw.toLowerCase().split(/[\s,、]+/) : [];
       
-      // チェックされた特徴（複数）を取得
       const featureCheckboxes = document.querySelectorAll('input[name="advFeature"]:checked');
       const selectedFeatures = Array.from(featureCheckboxes).map(cb => cb.value);
 
@@ -562,6 +558,9 @@
     }
 
     function renderData(data) {
+      currentFilteredData = data;
+      currentDisplayCount = 0;
+      
       const listContainer = document.getElementById('listContainer');
       listContainer.innerHTML = '';
       markerGroup.clearLayers();
@@ -572,14 +571,62 @@
       }
 
       const bounds = [];
+      const markers = []; 
+      
+      currentFilteredData.forEach(function(row, index) {
+        if (!row['緯度'] || !row['経度']) return;
 
-      data.forEach(function(row) {
-        if (!row || !row['座標']) return;
+        const squareIcon = L.divIcon({
+          className: 'custom-square-marker',
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        });
+        
+        const marker = L.marker([row['緯度'], row['経度']], { icon: squareIcon });
+        row._marker = marker;
 
+        marker.on('click', function() {
+          while (currentDisplayCount <= index && currentDisplayCount < currentFilteredData.length) {
+            renderListChunk();
+          }
+          
+          document.querySelectorAll('.data-card.active').forEach(c => c.classList.remove('active', 'highlight'));
+          document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
+          
+          const targetCard = document.getElementById('card-' + index);
+          if (targetCard) {
+            targetCard.classList.add('active', 'highlight');
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          
+          const iconElement = marker.getElement();
+          if (iconElement) iconElement.classList.add('selected');
+        });
+
+        markers.push(marker);
+        bounds.push([row['緯度'], row['経度']]);
+      });
+
+      markerGroup.addLayers(markers);
+
+      if (bounds.length > 0 && map) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+      renderListChunk();
+    }
+
+    function renderListChunk() {
+      const listContainer = document.getElementById('listContainer');
+      const fragment = document.createDocumentFragment();
+      const end = Math.min(currentDisplayCount + CHUNK_SIZE, currentFilteredData.length);
+
+      for (let i = currentDisplayCount; i < end; i++) {
+        const row = currentFilteredData[i];
         const imgUrl = row['画像'] ? row['画像'].toString() : 'https://placehold.co/120x120?text=No+Image';
 
         const card = document.createElement('div');
         card.className = 'data-card';
+        card.id = 'card-' + i;
        
         const img = document.createElement('img');
         img.className = 'card-img';
@@ -607,92 +654,39 @@
         if (displayDate.indexOf('Date(') !== -1) {
           const matches = displayDate.match(/Date\((\d+),(\d+),(\d+)/);
           if (matches) {
-            const y = matches[1];
-            const m = String(Number(matches[2]) + 1).padStart(2, '0');
-            const d = matches[3].padStart(2, '0');
-            displayDate = y + '年' + m + '月' + d + '日';
+            displayDate = matches[1] + '年' + String(Number(matches[2]) + 1).padStart(2, '0') + '月' + matches[3].padStart(2, '0') + '日';
           }
-        } else {
-          displayDate = displayDate.split('T')[0]; // 予備
         }
 
         const detailDiv = document.createElement('div');
         detailDiv.className = 'card-detail';
-        detailDiv.innerHTML = '<b>座標:</b> ' + (row['座標'] || '-') + '<br>' + '<b>地名:</b> ' + (row['地名'] || '-') + '<br>' + '<b>撮影日:</b> ' + displayDate;
+        detailDiv.innerHTML = '<b>座標:</b> ' + (row['座標'] || '-') + '<br><b>地名:</b> ' + (row['地名'] || '-') + '<br><b>撮影日:</b> ' + displayDate;
         info.appendChild(detailDiv);
 
         card.addEventListener('click', function() {
-          document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
-          document.querySelectorAll('.data-card.highlight').forEach(c => { if (c !== card) c.classList.remove('highlight'); });
+          document.querySelectorAll('.data-card.active').forEach(c => c.classList.remove('active', 'highlight'));
           document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
-          markerGroup.eachLayer(function(layer){
-            if (layer.setZIndexOffset) layer.setZIndexOffset(0);
-          });
-          const isActive = card.classList.toggle('active');
-          if (isActive) {
-            card.classList.add('highlight');
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            if (card.associatedMarker && card.associatedMarker.getElement()){
-              card.associatedMarker.getElement().classList.add('selected');
-              card.associatedMarker.setZIndexOffset(1000);
-            }
-          } else {
-            card.classList.remove('highlight');
-            if (card.associatedMarker){
-              card.associatedMarker.setZIndexOffset(0);
-            }
-          }
           
-          if (row['座標']) {
-            const parts = row['座標'].toString().split(',');
-            if (parts.length === 2) {
-              const lat = Number(parts[0]);
-              const lng = Number(parts[1]);
-              if (!isNaN(lat) && !isNaN(lng)) {
-                map.setView([lat, lng], 16);
-              }
+          card.classList.add('active', 'highlight');
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+          if (row['緯度'] && row['経度']) {
+            map.setView([row['緯度'], row['経度']], 16);
+            if (row._marker) {
+              markerGroup.zoomToShowLayer(row._marker, function() {
+                const iconElement = row._marker.getElement();
+                if (iconElement) iconElement.classList.add('selected');
+              });
             }
           }
         });
-
-        listContainer.appendChild(card);
-
-        if (row['座標']) {
-          const parts = row['座標'].toString().split(',');
-          if (parts.length === 2) {
-            const lat = Number(parts[0]);
-            const lng = Number(parts[1]);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const squareIcon = L.divIcon({
-                className: 'custom-square-marker',
-                iconSize: [12, 12],                // [横幅, 縦幅]（ピクセル）
-                iconAnchor: [6, 6]                 // 中心点を座標に合わせる
-              });
-              const marker = L.marker([lat, lng], { icon: squareIcon });
-              card.associatedMarker = marker;
-              markerGroup.addLayer(marker);
-              marker.on('click', function() {
-                document.querySelectorAll('.data-card.active').forEach(c => { if (c !== card) c.classList.remove('active'); });
-                document.querySelectorAll('.data-card.highlight').forEach(c => c.classList.remove('highlight'));
-                card.classList.add('highlight');
-                card.classList.add('active');
-                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                document.querySelectorAll('.custom-square-marker').forEach(m => m.classList.remove('selected'));
-                const iconElement = marker.getElement();
-                if (iconElement) {
-                  iconElement.classList.add('selected');
-                }
-              });
-              bounds.push([lat, lng]);
-            }
-          }
-        }
-      });
-
-      if (bounds.length > 0 && map) {
-        map.fitBounds(bounds, { padding: [30, 30] });
+        fragment.appendChild(card);
       }
+      
+      listContainer.appendChild(fragment);
+      currentDisplayCount = end;
     }
+    
     function openViewer(src) {
       if (src.indexOf('placehold.co') !== -1) return;
       const viewer = document.getElementById('imageViewer');
